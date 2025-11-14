@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Validation Fix Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .pass { color: green; }
+        .fail { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Mortgage Eligibility Validation Fix Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Form Values</h2>
+        <form id="testForm">
+            <label>Occupancy:</label>
+            <select id="occupancy">
+                <option value="primary">Primary Residence</option>
+                <option value="second_home">Secondary Residence</option>
+                <option value="investment">Investment Property</option>
+            </select>
+            <br><br>
+            
+            <label>Purpose:</label>
+            <select id="purpose">
+                <option value="purchase">Purchase</option>
+                <option value="rate_term_refi">Refinance</option>
+                <option value="cash_out_refi">Cash-Out Refinance</option>
+            </select>
+            <br><br>
+            
+            <button type="button" onclick="testValues()">Test Values</button>
+        </form>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        function testValues() {
+            const occupancy = document.getElementById('occupancy').value;
+            const purpose = document.getElementById('purpose').value;
+            
+            const validOccupancies = ['primary', 'second_home', 'investment'];
+            const validPurposes = ['purchase', 'rate_term_refi', 'cash_out_refi'];
+            
+            let results = '<h3>Validation Results:</h3>';
+            
+            // Test occupancy
+            if (validOccupancies.includes(occupancy)) {
+                results += `<p class="pass">✓ Occupancy "${occupancy}" is valid</p>`;
+            } else {
+                results += `<p class="fail">✗ Occupancy "${occupancy}" is invalid</p>`;
+            }
+            
+            // Test purpose
+            if (validPurposes.includes(purpose)) {
+                results += `<p class="pass">✓ Purpose "${purpose}" is valid</p>`;
+            } else {
+                results += `<p class="fail">✗ Purpose "${purpose}" is invalid</p>`;
+            }
+            
+            results += '<h3>Expected Backend Values:</h3>';
+            results += `<p>Occupancy: ${occupancy}</p>`;
+            results += `<p>Purpose: ${purpose}</p>`;
+            
+            document.getElementById('results').innerHTML = results;
+        }
+        
+        // Test all combinations on load
+        window.onload = function() {
+            testValues();
+        };
+    </script>
+</body>
+</html>
