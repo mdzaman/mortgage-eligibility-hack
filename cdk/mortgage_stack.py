@@ -2,9 +2,14 @@ from aws_cdk import (
     Stack,
     aws_lambda as _lambda,
     aws_apigateway as apigw,
+    aws_s3 as s3,
+    aws_s3_deployment as s3deploy,
+    aws_cloudfront as cloudfront,
+    aws_cloudfront_origins as origins,
     aws_iam as iam,
     Duration,
-    CfnOutput
+    CfnOutput,
+    RemovalPolicy
 )
 from constructs import Construct
 
@@ -55,30 +60,6 @@ class MortgageStack(Stack):
         )
 
         # API routes with explicit cache disabling
-        # Add GET method to root
-        api.root.add_method("GET", lambda_integration,
-            method_responses=[apigw.MethodResponse(
-                status_code="200",
-                response_parameters={
-                    "method.response.header.Cache-Control": True,
-                    "method.response.header.Pragma": True,
-                    "method.response.header.Expires": True
-                }
-            )]
-        )
-
-        # Add HEAD method to root (fixes 403 errors)
-        api.root.add_method("HEAD", lambda_integration,
-            method_responses=[apigw.MethodResponse(
-                status_code="200",
-                response_parameters={
-                    "method.response.header.Cache-Control": True,
-                    "method.response.header.Pragma": True,
-                    "method.response.header.Expires": True
-                }
-            )]
-        )
-
         # /api routes (for frontend compatibility)
         api_resource = api.root.add_resource("api")
 
@@ -98,5 +79,44 @@ class MortgageStack(Stack):
         api_presets.add_method("GET", lambda_integration)
         api_presets.add_method("HEAD", lambda_integration)
 
-        # Output API URL
+        # S3 bucket for static web hosting
+        web_bucket = s3.Bucket(
+            self, "WebBucket",
+            bucket_name=f"mortgage-eligibility-web-{self.account}-{self.region}",
+            website_index_document="index.html",
+            website_error_document="index.html",
+            public_read_access=True,
+            block_public_access=s3.BlockPublicAccess.BLOCK_ACLS,
+            removal_policy=RemovalPolicy.DESTROY,
+            auto_delete_objects=True
+        )
+
+        # Deploy static web files to S3
+        s3deploy.BucketDeployment(
+            self, "WebDeployment",
+            sources=[s3deploy.Source.asset("../static-web")],
+            destination_bucket=web_bucket
+        )
+
+        # CloudFront distribution for the web app
+        distribution = cloudfront.Distribution(
+            self, "WebDistribution",
+            default_behavior=cloudfront.BehaviorOptions(
+                origin=origins.S3Origin(web_bucket),
+                viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+                cache_policy=cloudfront.CachePolicy.CACHING_DISABLED
+            ),
+            default_root_object="index.html",
+            error_responses=[
+                cloudfront.ErrorResponse(
+                    http_status=404,
+                    response_http_status=200,
+                    response_page_path="/index.html"
+                )
+            ]
+        )
+
+        # Output URLs
         CfnOutput(self, "ApiUrl", value=api.url)
+        CfnOutput(self, "WebsiteUrl", value=f"https://{distribution.distribution_domain_name}")
+        CfnOutput(self, "S3WebsiteUrl", value=web_bucket.bucket_website_url)

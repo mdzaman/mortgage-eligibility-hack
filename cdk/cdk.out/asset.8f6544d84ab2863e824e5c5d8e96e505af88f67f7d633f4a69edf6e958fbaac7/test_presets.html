@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Presets</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1e1e1e; color: #d4d4d4; }
+        button { margin: 10px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
+        #log { background: #252526; padding: 15px; margin-top: 20px; min-height: 200px; }
+        .log-entry { padding: 5px; border-bottom: 1px solid #333; }
+        .success { color: #4ec9b0; }
+        .error { color: #f48771; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Preset Loading Test</h1>
+    <button onclick="testPresets()">Test Load Presets</button>
+    <button onclick="testLoadPrime()">Load Prime Conforming</button>
+    <button onclick="testLoadFTHB()">Load FTHB</button>
+    <button onclick="testLoadInvestment()">Load Investment</button>
+    <button onclick="clearLog()">Clear Log</button>
+
+    <div id="log"></div>
+
+    <script>
+        let presets = {};
+
+        function log(message, type = 'log') {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry ' + (type === 'success' ? 'success' : type === 'error' ? 'error' : '');
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logDiv.appendChild(entry);
+            console.log(message);
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+
+        async function testPresets() {
+            clearLog();
+            log('Testing preset loading...', 'log');
+
+            try {
+                log('Fetching /api/presets...', 'log');
+                const response = await fetch('/api/presets');
+                log('Response status: ' + response.status, response.ok ? 'success' : 'error');
+
+                const data = await response.json();
+                presets = data;
+
+                log('Presets loaded: ' + Object.keys(presets).join(', '), 'success');
+
+                // Show details
+                Object.keys(presets).forEach(key => {
+                    const preset = presets[key];
+                    log(`  ${key}: Credit ${preset.credit_score}, LTV ${((preset.loan_amount / preset.appraised_value) * 100).toFixed(0)}%`, 'log');
+                });
+
+            } catch (error) {
+                log('Error: ' + error.message, 'error');
+            }
+        }
+
+        function testLoadPrime() {
+            clearLog();
+            log('Loading Prime Conforming preset...', 'log');
+
+            if (!presets.prime_conforming) {
+                log('Preset not loaded! Click "Test Load Presets" first.', 'error');
+                return;
+            }
+
+            const preset = presets.prime_conforming;
+            log('Credit Score: ' + preset.credit_score, 'success');
+            log('Income: $' + preset.gross_monthly_income, 'success');
+            log('Loan Amount: $' + preset.loan_amount, 'success');
+            log('LTV: ' + ((preset.loan_amount / preset.appraised_value) * 100).toFixed(0) + '%', 'success');
+        }
+
+        function testLoadFTHB() {
+            clearLog();
+            log('Loading FTHB preset...', 'log');
+
+            if (!presets.fthb_high_ltv) {
+                log('Preset not loaded! Click "Test Load Presets" first.', 'error');
+                return;
+            }
+
+            const preset = presets.fthb_high_ltv;
+            log('Credit Score: ' + preset.credit_score, 'success');
+            log('First Time Homebuyer: ' + preset.first_time_homebuyer, 'success');
+            log('AMI Ratio: ' + preset.ami_ratio, 'success');
+            log('LTV: ' + ((preset.loan_amount / preset.appraised_value) * 100).toFixed(0) + '%', 'success');
+            log('MI Coverage: ' + (preset.mi_coverage_pct * 100) + '%', 'success');
+        }
+
+        function testLoadInvestment() {
+            clearLog();
+            log('Loading Investment preset...', 'log');
+
+            if (!presets.investment_cashout) {
+                log('Preset not loaded! Click "Test Load Presets" first.', 'error');
+                return;
+            }
+
+            const preset = presets.investment_cashout;
+            log('Credit Score: ' + preset.credit_score, 'success');
+            log('Occupancy: ' + preset.occupancy, 'success');
+            log('Financed Properties: ' + preset.num_financed_properties, 'success');
+            log('Purpose: ' + preset.purpose, 'success');
+        }
+
+        // Auto-load on page load
+        window.addEventListener('load', () => {
+            log('Page loaded. Click "Test Load Presets" to begin.', 'log');
+            testPresets();
+        });
+    </script>
+</body>
+</html>

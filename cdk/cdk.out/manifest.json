@@ -18,7 +18,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/ea77e93f77e222ac9433a150685e697d63cb4d28995f04c6a55f267de327fd25.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/fae846af22e0eca3680bf51373f7290d84aa90e8f3f104d08988ea03aa3a2764.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -73,7 +73,7 @@
         "/MortgageEligibilityStack/MortgageApi/Deployment/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "MortgageApiDeploymentE0A471B507e93c5d5dc194054d535f04fce85b7b"
+            "data": "MortgageApiDeploymentE0A471B5cecc366144b87abe9cf464501eae1cd2"
           }
         ],
         "/MortgageEligibilityStack/MortgageApi/DeploymentStage.prod/Resource": [
@@ -92,24 +92,6 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "MortgageApiOPTIONSF74C8EFF"
-          }
-        ],
-        "/MortgageEligibilityStack/MortgageApi/Default/GET/ApiPermission.MortgageEligibilityStackMortgageApiC416C2B6.GET..": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "MortgageApiGETApiPermissionMortgageEligibilityStackMortgageApiC416C2B6GETC14CABAF"
-          }
-        ],
-        "/MortgageEligibilityStack/MortgageApi/Default/GET/ApiPermission.Test.MortgageEligibilityStackMortgageApiC416C2B6.GET..": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "MortgageApiGETApiPermissionTestMortgageEligibilityStackMortgageApiC416C2B6GET87938DFC"
-          }
-        ],
-        "/MortgageEligibilityStack/MortgageApi/Default/GET/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "MortgageApiGET37891F50"
           }
         ],
         "/MortgageEligibilityStack/MortgageApi/Default/api/Resource": [
@@ -154,6 +136,24 @@
             "data": "MortgageApiapievaluatePOST052B6ACF"
           }
         ],
+        "/MortgageEligibilityStack/MortgageApi/Default/api/evaluate/HEAD/ApiPermission.MortgageEligibilityStackMortgageApiC416C2B6.HEAD..api.evaluate": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MortgageApiapievaluateHEADApiPermissionMortgageEligibilityStackMortgageApiC416C2B6HEADapievaluateD34D3E97"
+          }
+        ],
+        "/MortgageEligibilityStack/MortgageApi/Default/api/evaluate/HEAD/ApiPermission.Test.MortgageEligibilityStackMortgageApiC416C2B6.HEAD..api.evaluate": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MortgageApiapievaluateHEADApiPermissionTestMortgageEligibilityStackMortgageApiC416C2B6HEADapievaluate436639A7"
+          }
+        ],
+        "/MortgageEligibilityStack/MortgageApi/Default/api/evaluate/HEAD/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MortgageApiapievaluateHEAD74D6EF11"
+          }
+        ],
         "/MortgageEligibilityStack/MortgageApi/Default/api/presets/Resource": [
           {
             "type": "aws:cdk:logicalId",
@@ -182,6 +182,24 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "MortgageApiapipresetsGET33CBE443"
+          }
+        ],
+        "/MortgageEligibilityStack/MortgageApi/Default/api/presets/HEAD/ApiPermission.MortgageEligibilityStackMortgageApiC416C2B6.HEAD..api.presets": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MortgageApiapipresetsHEADApiPermissionMortgageEligibilityStackMortgageApiC416C2B6HEADapipresets5D38ABDC"
+          }
+        ],
+        "/MortgageEligibilityStack/MortgageApi/Default/api/presets/HEAD/ApiPermission.Test.MortgageEligibilityStackMortgageApiC416C2B6.HEAD..api.presets": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MortgageApiapipresetsHEADApiPermissionTestMortgageEligibilityStackMortgageApiC416C2B6HEADapipresets116152B4"
+          }
+        ],
+        "/MortgageEligibilityStack/MortgageApi/Default/api/presets/HEAD/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MortgageApiapipresetsHEAD24BE626A"
           }
         ],
         "/MortgageEligibilityStack/MortgageApi/Default/evaluate/Resource": [
@@ -214,6 +232,24 @@
             "data": "MortgageApievaluatePOSTEB215BAB"
           }
         ],
+        "/MortgageEligibilityStack/MortgageApi/Default/evaluate/HEAD/ApiPermission.MortgageEligibilityStackMortgageApiC416C2B6.HEAD..evaluate": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MortgageApievaluateHEADApiPermissionMortgageEligibilityStackMortgageApiC416C2B6HEADevaluateA16775ED"
+          }
+        ],
+        "/MortgageEligibilityStack/MortgageApi/Default/evaluate/HEAD/ApiPermission.Test.MortgageEligibilityStackMortgageApiC416C2B6.HEAD..evaluate": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MortgageApievaluateHEADApiPermissionTestMortgageEligibilityStackMortgageApiC416C2B6HEADevaluate95AABFB3"
+          }
+        ],
+        "/MortgageEligibilityStack/MortgageApi/Default/evaluate/HEAD/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MortgageApievaluateHEAD905560C8"
+          }
+        ],
         "/MortgageEligibilityStack/MortgageApi/Default/presets/Resource": [
           {
             "type": "aws:cdk:logicalId",
@@ -244,10 +280,122 @@
             "data": "MortgageApipresetsGETB713A1BA"
           }
         ],
+        "/MortgageEligibilityStack/MortgageApi/Default/presets/HEAD/ApiPermission.MortgageEligibilityStackMortgageApiC416C2B6.HEAD..presets": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MortgageApipresetsHEADApiPermissionMortgageEligibilityStackMortgageApiC416C2B6HEADpresets8BCF4F3D"
+          }
+        ],
+        "/MortgageEligibilityStack/MortgageApi/Default/presets/HEAD/ApiPermission.Test.MortgageEligibilityStackMortgageApiC416C2B6.HEAD..presets": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MortgageApipresetsHEADApiPermissionTestMortgageEligibilityStackMortgageApiC416C2B6HEADpresetsB54CE56F"
+          }
+        ],
+        "/MortgageEligibilityStack/MortgageApi/Default/presets/HEAD/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MortgageApipresetsHEAD19683B87"
+          }
+        ],
+        "/MortgageEligibilityStack/WebBucket/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WebBucket12880F5B"
+          }
+        ],
+        "/MortgageEligibilityStack/WebBucket/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WebBucketPolicy95D08FAA"
+          }
+        ],
+        "/MortgageEligibilityStack/WebBucket/AutoDeleteObjectsCustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WebBucketAutoDeleteObjectsCustomResource9C1A079F"
+          }
+        ],
+        "/MortgageEligibilityStack/Custom::S3AutoDeleteObjectsCustomResourceProvider": [
+          {
+            "type": "aws:cdk:is-custom-resource-handler-customResourceProvider",
+            "data": true
+          }
+        ],
+        "/MortgageEligibilityStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+          }
+        ],
+        "/MortgageEligibilityStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F"
+          }
+        ],
+        "/MortgageEligibilityStack/WebDeployment/AwsCliLayer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WebDeploymentAwsCliLayer79C1EFEA"
+          }
+        ],
+        "/MortgageEligibilityStack/WebDeployment/CustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WebDeploymentCustomResource08EEC474"
+          }
+        ],
+        "/MortgageEligibilityStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C": [
+          {
+            "type": "aws:cdk:is-custom-resource-handler-singleton",
+            "data": true
+          },
+          {
+            "type": "aws:cdk:is-custom-resource-handler-runtime-family",
+            "data": 2
+          }
+        ],
+        "/MortgageEligibilityStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265"
+          }
+        ],
+        "/MortgageEligibilityStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF"
+          }
+        ],
+        "/MortgageEligibilityStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536"
+          }
+        ],
+        "/MortgageEligibilityStack/WebDistribution/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WebDistribution59C46482"
+          }
+        ],
         "/MortgageEligibilityStack/ApiUrl": [
           {
             "type": "aws:cdk:logicalId",
             "data": "ApiUrl"
+          }
+        ],
+        "/MortgageEligibilityStack/WebsiteUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WebsiteUrl"
+          }
+        ],
+        "/MortgageEligibilityStack/S3WebsiteUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "S3WebsiteUrl"
           }
         ],
         "/MortgageEligibilityStack/CDKMetadata/Default": [

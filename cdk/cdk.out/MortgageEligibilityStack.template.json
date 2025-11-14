@@ -68,7 +68,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "5c0fa958105784671ef69d23b3c48069909de57d1d8c2e96b95789e1ba3ce0a7.zip"
+     "S3Key": "8f6544d84ab2863e824e5c5d8e96e505af88f67f7d633f4a69edf6e958fbaac7.zip"
     },
     "Handler": "lambda_handler.handler",
     "MemorySize": 512,
@@ -90,7 +90,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "MortgageEligibilityStack/MortgageLambda/Resource",
-    "aws:asset:path": "asset.5c0fa958105784671ef69d23b3c48069909de57d1d8c2e96b95789e1ba3ce0a7",
+    "aws:asset:path": "asset.8f6544d84ab2863e824e5c5d8e96e505af88f67f7d633f4a69edf6e958fbaac7",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -160,7 +160,7 @@
     "aws:cdk:path": "MortgageEligibilityStack/MortgageApi/Account"
    }
   },
-  "MortgageApiDeploymentE0A471B507e93c5d5dc194054d535f04fce85b7b": {
+  "MortgageApiDeploymentE0A471B5cecc366144b87abe9cf464501eae1cd2": {
    "Type": "AWS::ApiGateway::Deployment",
    "Properties": {
     "Description": "Serverless mortgage eligibility engine",
@@ -169,20 +169,23 @@
     }
    },
    "DependsOn": [
+    "MortgageApiapievaluateHEAD74D6EF11",
     "MortgageApiapievaluateOPTIONS7373E2C6",
     "MortgageApiapievaluatePOST052B6ACF",
     "MortgageApiapievaluate32534559",
     "MortgageApiapiOPTIONSCA45918A",
     "MortgageApiapipresetsGET33CBE443",
+    "MortgageApiapipresetsHEAD24BE626A",
     "MortgageApiapipresetsOPTIONS12348C1A",
     "MortgageApiapipresets2EEC66A9",
     "MortgageApiapiE901CF7D",
+    "MortgageApievaluateHEAD905560C8",
     "MortgageApievaluateOPTIONSE396A9AB",
     "MortgageApievaluatePOSTEB215BAB",
     "MortgageApievaluateE52E2074",
-    "MortgageApiGET37891F50",
     "MortgageApiOPTIONSF74C8EFF",
     "MortgageApipresetsGETB713A1BA",
+    "MortgageApipresetsHEAD19683B87",
     "MortgageApipresetsOPTIONS9BF23AB2",
     "MortgageApipresets0D485452"
    ],
@@ -195,7 +198,7 @@
    "Properties": {
     "CacheClusterEnabled": false,
     "DeploymentId": {
-     "Ref": "MortgageApiDeploymentE0A471B507e93c5d5dc194054d535f04fce85b7b"
+     "Ref": "MortgageApiDeploymentE0A471B5cecc366144b87abe9cf464501eae1cd2"
     },
     "MethodSettings": [
      {
@@ -266,147 +269,6 @@
    },
    "Metadata": {
     "aws:cdk:path": "MortgageEligibilityStack/MortgageApi/Default/OPTIONS/Resource"
-   }
-  },
-  "MortgageApiGETApiPermissionMortgageEligibilityStackMortgageApiC416C2B6GETC14CABAF": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "MortgageLambda87717171",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:",
-       {
-        "Ref": "AWS::Partition"
-       },
-       ":execute-api:",
-       {
-        "Ref": "AWS::Region"
-       },
-       ":",
-       {
-        "Ref": "AWS::AccountId"
-       },
-       ":",
-       {
-        "Ref": "MortgageApi71A1B47D"
-       },
-       "/",
-       {
-        "Ref": "MortgageApiDeploymentStageprodB0BA64A8"
-       },
-       "/GET/"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "MortgageEligibilityStack/MortgageApi/Default/GET/ApiPermission.MortgageEligibilityStackMortgageApiC416C2B6.GET.."
-   }
-  },
-  "MortgageApiGETApiPermissionTestMortgageEligibilityStackMortgageApiC416C2B6GET87938DFC": {
-   "Type": "AWS::Lambda::Permission",
-   "Properties": {
-    "Action": "lambda:InvokeFunction",
-    "FunctionName": {
-     "Fn::GetAtt": [
-      "MortgageLambda87717171",
-      "Arn"
-     ]
-    },
-    "Principal": "apigateway.amazonaws.com",
-    "SourceArn": {
-     "Fn::Join": [
-      "",
-      [
-       "arn:",
-       {
-        "Ref": "AWS::Partition"
-       },
-       ":execute-api:",
-       {
-        "Ref": "AWS::Region"
-       },
-       ":",
-       {
-        "Ref": "AWS::AccountId"
-       },
-       ":",
-       {
-        "Ref": "MortgageApi71A1B47D"
-       },
-       "/test-invoke-stage/GET/"
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "MortgageEligibilityStack/MortgageApi/Default/GET/ApiPermission.Test.MortgageEligibilityStackMortgageApiC416C2B6.GET.."
-   }
-  },
-  "MortgageApiGET37891F50": {
-   "Type": "AWS::ApiGateway::Method",
-   "Properties": {
-    "AuthorizationType": "NONE",
-    "HttpMethod": "GET",
-    "Integration": {
-     "CacheKeyParameters": [],
-     "IntegrationHttpMethod": "POST",
-     "Type": "AWS_PROXY",
-     "Uri": {
-      "Fn::Join": [
-       "",
-       [
-        "arn:",
-        {
-         "Ref": "AWS::Partition"
-        },
-        ":apigateway:",
-        {
-         "Ref": "AWS::Region"
-        },
-        ":lambda:path/2015-03-31/functions/",
-        {
-         "Fn::GetAtt": [
-          "MortgageLambda87717171",
-          "Arn"
-         ]
-        },
-        "/invocations"
-       ]
-      ]
-     }
-    },
-    "MethodResponses": [
-     {
-      "ResponseParameters": {
-       "method.response.header.Cache-Control": true,
-       "method.response.header.Pragma": true,
-       "method.response.header.Expires": true
-      },
-      "StatusCode": "200"
-     }
-    ],
-    "ResourceId": {
-     "Fn::GetAtt": [
-      "MortgageApi71A1B47D",
-      "RootResourceId"
-     ]
-    },
-    "RestApiId": {
-     "Ref": "MortgageApi71A1B47D"
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "MortgageEligibilityStack/MortgageApi/Default/GET/Resource"
    }
   },
   "MortgageApiapiE901CF7D": {
@@ -656,6 +518,134 @@
     "aws:cdk:path": "MortgageEligibilityStack/MortgageApi/Default/api/evaluate/POST/Resource"
    }
   },
+  "MortgageApiapievaluateHEADApiPermissionMortgageEligibilityStackMortgageApiC416C2B6HEADapievaluateD34D3E97": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "MortgageLambda87717171",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "MortgageApi71A1B47D"
+       },
+       "/",
+       {
+        "Ref": "MortgageApiDeploymentStageprodB0BA64A8"
+       },
+       "/HEAD/api/evaluate"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MortgageEligibilityStack/MortgageApi/Default/api/evaluate/HEAD/ApiPermission.MortgageEligibilityStackMortgageApiC416C2B6.HEAD..api.evaluate"
+   }
+  },
+  "MortgageApiapievaluateHEADApiPermissionTestMortgageEligibilityStackMortgageApiC416C2B6HEADapievaluate436639A7": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "MortgageLambda87717171",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "MortgageApi71A1B47D"
+       },
+       "/test-invoke-stage/HEAD/api/evaluate"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MortgageEligibilityStack/MortgageApi/Default/api/evaluate/HEAD/ApiPermission.Test.MortgageEligibilityStackMortgageApiC416C2B6.HEAD..api.evaluate"
+   }
+  },
+  "MortgageApiapievaluateHEAD74D6EF11": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "HEAD",
+    "Integration": {
+     "CacheKeyParameters": [],
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:",
+        {
+         "Ref": "AWS::Region"
+        },
+        ":lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "MortgageLambda87717171",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "MortgageApiapievaluate32534559"
+    },
+    "RestApiId": {
+     "Ref": "MortgageApi71A1B47D"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MortgageEligibilityStack/MortgageApi/Default/api/evaluate/HEAD/Resource"
+   }
+  },
   "MortgageApiapipresets2EEC66A9": {
    "Type": "AWS::ApiGateway::Resource",
    "Properties": {
@@ -840,6 +830,134 @@
    },
    "Metadata": {
     "aws:cdk:path": "MortgageEligibilityStack/MortgageApi/Default/api/presets/GET/Resource"
+   }
+  },
+  "MortgageApiapipresetsHEADApiPermissionMortgageEligibilityStackMortgageApiC416C2B6HEADapipresets5D38ABDC": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "MortgageLambda87717171",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "MortgageApi71A1B47D"
+       },
+       "/",
+       {
+        "Ref": "MortgageApiDeploymentStageprodB0BA64A8"
+       },
+       "/HEAD/api/presets"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MortgageEligibilityStack/MortgageApi/Default/api/presets/HEAD/ApiPermission.MortgageEligibilityStackMortgageApiC416C2B6.HEAD..api.presets"
+   }
+  },
+  "MortgageApiapipresetsHEADApiPermissionTestMortgageEligibilityStackMortgageApiC416C2B6HEADapipresets116152B4": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "MortgageLambda87717171",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "MortgageApi71A1B47D"
+       },
+       "/test-invoke-stage/HEAD/api/presets"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MortgageEligibilityStack/MortgageApi/Default/api/presets/HEAD/ApiPermission.Test.MortgageEligibilityStackMortgageApiC416C2B6.HEAD..api.presets"
+   }
+  },
+  "MortgageApiapipresetsHEAD24BE626A": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "HEAD",
+    "Integration": {
+     "CacheKeyParameters": [],
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:",
+        {
+         "Ref": "AWS::Region"
+        },
+        ":lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "MortgageLambda87717171",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "MortgageApiapipresets2EEC66A9"
+    },
+    "RestApiId": {
+     "Ref": "MortgageApi71A1B47D"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MortgageEligibilityStack/MortgageApi/Default/api/presets/HEAD/Resource"
    }
   },
   "MortgageApievaluateE52E2074": {
@@ -1031,6 +1149,134 @@
     "aws:cdk:path": "MortgageEligibilityStack/MortgageApi/Default/evaluate/POST/Resource"
    }
   },
+  "MortgageApievaluateHEADApiPermissionMortgageEligibilityStackMortgageApiC416C2B6HEADevaluateA16775ED": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "MortgageLambda87717171",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "MortgageApi71A1B47D"
+       },
+       "/",
+       {
+        "Ref": "MortgageApiDeploymentStageprodB0BA64A8"
+       },
+       "/HEAD/evaluate"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MortgageEligibilityStack/MortgageApi/Default/evaluate/HEAD/ApiPermission.MortgageEligibilityStackMortgageApiC416C2B6.HEAD..evaluate"
+   }
+  },
+  "MortgageApievaluateHEADApiPermissionTestMortgageEligibilityStackMortgageApiC416C2B6HEADevaluate95AABFB3": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "MortgageLambda87717171",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "MortgageApi71A1B47D"
+       },
+       "/test-invoke-stage/HEAD/evaluate"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MortgageEligibilityStack/MortgageApi/Default/evaluate/HEAD/ApiPermission.Test.MortgageEligibilityStackMortgageApiC416C2B6.HEAD..evaluate"
+   }
+  },
+  "MortgageApievaluateHEAD905560C8": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "HEAD",
+    "Integration": {
+     "CacheKeyParameters": [],
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:",
+        {
+         "Ref": "AWS::Region"
+        },
+        ":lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "MortgageLambda87717171",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "MortgageApievaluateE52E2074"
+    },
+    "RestApiId": {
+     "Ref": "MortgageApi71A1B47D"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MortgageEligibilityStack/MortgageApi/Default/evaluate/HEAD/Resource"
+   }
+  },
   "MortgageApipresets0D485452": {
    "Type": "AWS::ApiGateway::Resource",
    "Properties": {
@@ -1220,10 +1466,617 @@
     "aws:cdk:path": "MortgageEligibilityStack/MortgageApi/Default/presets/GET/Resource"
    }
   },
+  "MortgageApipresetsHEADApiPermissionMortgageEligibilityStackMortgageApiC416C2B6HEADpresets8BCF4F3D": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "MortgageLambda87717171",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "MortgageApi71A1B47D"
+       },
+       "/",
+       {
+        "Ref": "MortgageApiDeploymentStageprodB0BA64A8"
+       },
+       "/HEAD/presets"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MortgageEligibilityStack/MortgageApi/Default/presets/HEAD/ApiPermission.MortgageEligibilityStackMortgageApiC416C2B6.HEAD..presets"
+   }
+  },
+  "MortgageApipresetsHEADApiPermissionTestMortgageEligibilityStackMortgageApiC416C2B6HEADpresetsB54CE56F": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "MortgageLambda87717171",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:",
+       {
+        "Ref": "AWS::Partition"
+       },
+       ":execute-api:",
+       {
+        "Ref": "AWS::Region"
+       },
+       ":",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "MortgageApi71A1B47D"
+       },
+       "/test-invoke-stage/HEAD/presets"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MortgageEligibilityStack/MortgageApi/Default/presets/HEAD/ApiPermission.Test.MortgageEligibilityStackMortgageApiC416C2B6.HEAD..presets"
+   }
+  },
+  "MortgageApipresetsHEAD19683B87": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "HEAD",
+    "Integration": {
+     "CacheKeyParameters": [],
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":apigateway:",
+        {
+         "Ref": "AWS::Region"
+        },
+        ":lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "MortgageLambda87717171",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "MortgageApipresets0D485452"
+    },
+    "RestApiId": {
+     "Ref": "MortgageApi71A1B47D"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MortgageEligibilityStack/MortgageApi/Default/presets/HEAD/Resource"
+   }
+  },
+  "WebBucket12880F5B": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketName": {
+     "Fn::Join": [
+      "",
+      [
+       "mortgage-eligibility-web-",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       "-",
+       {
+        "Ref": "AWS::Region"
+       }
+      ]
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "IgnorePublicAcls": true
+    },
+    "Tags": [
+     {
+      "Key": "aws-cdk:auto-delete-objects",
+      "Value": "true"
+     },
+     {
+      "Key": "aws-cdk:cr-owned:8008aa52",
+      "Value": "true"
+     }
+    ],
+    "WebsiteConfiguration": {
+     "ErrorDocument": "index.html",
+     "IndexDocument": "index.html"
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "MortgageEligibilityStack/WebBucket/Resource"
+   }
+  },
+  "WebBucketPolicy95D08FAA": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "WebBucket12880F5B"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "s3:GetObject",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": "*"
+       },
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::GetAtt": [
+            "WebBucket12880F5B",
+            "Arn"
+           ]
+          },
+          "/*"
+         ]
+        ]
+       }
+      },
+      {
+       "Action": [
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:PutBucketPolicy"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+          "Arn"
+         ]
+        }
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "WebBucket12880F5B",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "WebBucket12880F5B",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MortgageEligibilityStack/WebBucket/Policy/Resource"
+   }
+  },
+  "WebBucketAutoDeleteObjectsCustomResource9C1A079F": {
+   "Type": "Custom::S3AutoDeleteObjects",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F",
+      "Arn"
+     ]
+    },
+    "BucketName": {
+     "Ref": "WebBucket12880F5B"
+    }
+   },
+   "DependsOn": [
+    "WebBucketPolicy95D08FAA"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "MortgageEligibilityStack/WebBucket/AutoDeleteObjectsCustomResource/Default"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "MortgageEligibilityStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip"
+    },
+    "Timeout": 900,
+    "MemorySize": 128,
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Description": {
+     "Fn::Join": [
+      "",
+      [
+       "Lambda function for auto-deleting objects in ",
+       {
+        "Ref": "WebBucket12880F5B"
+       },
+       " S3 bucket."
+      ]
+     ]
+    }
+   },
+   "DependsOn": [
+    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "MortgageEligibilityStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler",
+    "aws:asset:path": "asset.faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6",
+    "aws:asset:property": "Code"
+   }
+  },
+  "WebDeploymentAwsCliLayer79C1EFEA": {
+   "Type": "AWS::Lambda::LayerVersion",
+   "Properties": {
+    "Content": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "1c5a2ab1d1e53b0672a644454aab3dbb258ccd0079c92ad0e23b95b2c2079f70.zip"
+    },
+    "Description": "/opt/awscli/aws"
+   },
+   "Metadata": {
+    "aws:cdk:path": "MortgageEligibilityStack/WebDeployment/AwsCliLayer/Resource",
+    "aws:asset:path": "asset.1c5a2ab1d1e53b0672a644454aab3dbb258ccd0079c92ad0e23b95b2c2079f70.zip",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Content"
+   }
+  },
+  "WebDeploymentCustomResource08EEC474": {
+   "Type": "Custom::CDKBucketDeployment",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536",
+      "Arn"
+     ]
+    },
+    "SourceBucketNames": [
+     {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     }
+    ],
+    "SourceObjectKeys": [
+     "03d6d4d8469b354d5c015d3ddf0f50f775de23e49809a048fe6ca0d27b8a43d0.zip"
+    ],
+    "DestinationBucketName": {
+     "Ref": "WebBucket12880F5B"
+    },
+    "Prune": true,
+    "OutputObjectKeys": true
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "MortgageEligibilityStack/WebDeployment/CustomResource/Default"
+   }
+  },
+  "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "MortgageEligibilityStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/Resource"
+   }
+  },
+  "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:GetBucket*",
+        "s3:GetObject*",
+        "s3:List*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:",
+           {
+            "Ref": "AWS::Partition"
+           },
+           ":s3:::",
+           {
+            "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+           },
+           "/*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:",
+           {
+            "Ref": "AWS::Partition"
+           },
+           ":s3:::",
+           {
+            "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+           }
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "s3:Abort*",
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:GetObject*",
+        "s3:List*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "WebBucket12880F5B",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "WebBucket12880F5B",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF",
+    "Roles": [
+     {
+      "Ref": "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "MortgageEligibilityStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "c6358465bf49dfae556bb430bf9c81fa578c221b82c308e3707901b1dd654762.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "AWS_CA_BUNDLE": "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem"
+     }
+    },
+    "Handler": "index.handler",
+    "Layers": [
+     {
+      "Ref": "WebDeploymentAwsCliLayer79C1EFEA"
+     }
+    ],
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.11",
+    "Timeout": 900
+   },
+   "DependsOn": [
+    "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRoleDefaultPolicy88902FDF",
+    "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756CServiceRole89A01265"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "MortgageEligibilityStack/Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/Resource",
+    "aws:asset:path": "asset.c6358465bf49dfae556bb430bf9c81fa578c221b82c308e3707901b1dd654762",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "WebDistribution59C46482": {
+   "Type": "AWS::CloudFront::Distribution",
+   "Properties": {
+    "DistributionConfig": {
+     "CustomErrorResponses": [
+      {
+       "ErrorCode": 404,
+       "ResponseCode": 200,
+       "ResponsePagePath": "/index.html"
+      }
+     ],
+     "DefaultCacheBehavior": {
+      "CachePolicyId": "4135ea2d-6df8-44a3-9df3-4b5a84be39ad",
+      "Compress": true,
+      "TargetOriginId": "MortgageEligibilityStackWebDistributionOrigin1A691DD05",
+      "ViewerProtocolPolicy": "redirect-to-https"
+     },
+     "DefaultRootObject": "index.html",
+     "Enabled": true,
+     "HttpVersion": "http2",
+     "IPV6Enabled": true,
+     "Origins": [
+      {
+       "CustomOriginConfig": {
+        "OriginProtocolPolicy": "http-only",
+        "OriginSSLProtocols": [
+         "TLSv1.2"
+        ]
+       },
+       "DomainName": {
+        "Fn::Select": [
+         2,
+         {
+          "Fn::Split": [
+           "/",
+           {
+            "Fn::GetAtt": [
+             "WebBucket12880F5B",
+             "WebsiteURL"
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       "Id": "MortgageEligibilityStackWebDistributionOrigin1A691DD05"
+      }
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MortgageEligibilityStack/WebDistribution/Resource"
+   }
+  },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02OwW7CQAxEv4X7xkBz4Rpa9YYahQ9AZuMGN8luFHsVRVH+He1CBad5nrHG/oD9IYfdBifJbN1mHV9hOSva1uAkl6XD/lojLN/BWWXvzOeve+eSxp5F2LvVMPawVL6jGCQtfcd2TnuJViP5BUVIBYooRnI4BtuSHlHI4MANKk04w1KRaDFw6nphYa0PTs0XDZ2fe3Ia3bfprNikBx5QkfgwWkr1J9Kbr2P4pP/0eSTxur7s9GMsYtfEnZ+gQ9DVlLPevNvmcID9bvMnzNkYnHJPUD30DnpCTXlYAQAA"
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/21RwW7CMAz9Fu4hg3HhWkA7bVpVpF2rkJrikSZV4qyqov77lLTQatrpvWc/+TnxK9/ud3yzEp1by+q+Vnjh4UxC3pnoXBmUaC6V4OHNa0loNDte9ZLnYBt0blLvogf7BTbpM+paAZmnf2AoGh4KoyCaE+ZGoezTpMQG5nZlEM4BOZ5FYBW0yvQNaOIHL+9Ap2chunkYqwfhgI00jpvYCHPKUg9MtFgLgk70PBTgKGsxbTbTTErjNbE5M1YX6kyiTs8ZSQHOeCshbfMBdDNVbE7s0Z1CEh+YVMZXV2s08XBCRxYv/vG/Sz0M84D0NTESdR19n55aT+zoHZnmv5g/rdyaH6zApj3HI5cqXq8UnZMKeda5o8J00IHlPd2MftnxPd9uVt8OcW29JmyAFyP+AkfgsNhIAgAA"
    },
    "Metadata": {
     "aws:cdk:path": "MortgageEligibilityStack/CDKMetadata/Default"
@@ -1281,6 +2134,30 @@
       },
       "/"
      ]
+    ]
+   }
+  },
+  "WebsiteUrl": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Fn::GetAtt": [
+        "WebDistribution59C46482",
+        "DomainName"
+       ]
+      }
+     ]
+    ]
+   }
+  },
+  "S3WebsiteUrl": {
+   "Value": {
+    "Fn::GetAtt": [
+     "WebBucket12880F5B",
+     "WebsiteURL"
     ]
    }
   }
