@@ -68,7 +68,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "e69185a418eb70fe75e47e00be6012aa53da4cb579ef3b9bc4f5e0a5dbc039d7.zip"
+     "S3Key": "8b5b1061c9a5354351436c1a31b8dbcae3252152a46e6a1b0e5d6e7c523848bc.zip"
     },
     "Handler": "lambda_handler.handler",
     "MemorySize": 512,
@@ -90,7 +90,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "MortgageEligibilityStack/MortgageLambda/Resource",
-    "aws:asset:path": "asset.e69185a418eb70fe75e47e00be6012aa53da4cb579ef3b9bc4f5e0a5dbc039d7",
+    "aws:asset:path": "asset.8b5b1061c9a5354351436c1a31b8dbcae3252152a46e6a1b0e5d6e7c523848bc",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FEDTI Fix Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .loading { background-color: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        button { padding: 10px 20px; margin: 10px 0; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
+        .metric { padding: 10px; background: #f8f9fa; border-radius: 5px; text-align: center; }
+        .metric .label { font-weight: bold; color: #666; }
+        .metric .value { font-size: 1.2em; color: #333; }
+    </style>
+</head>
+<body>
+    <h1>FEDTI Fix Test</h1>
+    <p>This test verifies that FEDTI is properly calculated and displayed in the web interface.</p>
+    
+    <button onclick="testFEDTI()">Test FEDTI Calculation</button>
+    
+    <div id="testResults"></div>
+    
+    <script>
+        const API_BASE_URL = 'https://gm515kqhwd.execute-api.us-east-1.amazonaws.com/prod';
+        
+        async function testFEDTI() {
+            const resultsDiv = document.getElementById('testResults');
+            resultsDiv.innerHTML = '<div class="test-result loading">Testing FEDTI calculation...</div>';
+            
+            const testData = {
+                credit_score: 760,
+                gross_monthly_income: 10000,
+                monthly_debts: 650,
+                num_financed_properties: 1,
+                first_time_homebuyer: false,
+                owns_property_last_3yrs: true,
+                liquid_assets: 50000,
+                ami_ratio: '',
+                purchase_price: 400000,
+                appraised_value: 400000,
+                units: 1,
+                property_type: 'SFR',
+                occupancy: 'primary',
+                condition_rating: 'C3',
+                is_high_cost_area: true,
+                loan_amount: 300000,
+                note_rate: 6.50,
+                term_months: 360,
+                purpose: 'purchase',
+                mi_type: '',
+                mi_coverage_pct: ''
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/evaluate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${await response.text()}`);
+                }
+                
+                const result = await response.json();
+                const metrics = result.calculated_metrics || {};
+                
+                let html = '<div class="test-result success">✓ API call successful</div>';
+                
+                html += '<div class="metrics">';
+                html += `<div class="metric"><div class="label">LTV</div><div class="value">${metrics.LTV || 'N/A'}</div></div>`;
+                html += `<div class="metric"><div class="label">CLTV</div><div class="value">${metrics.CLTV || 'N/A'}</div></div>`;
+                html += `<div class="metric"><div class="label">DTI</div><div class="value">${metrics.DTI || 'N/A'}</div></div>`;
+                html += `<div class="metric"><div class="label">FEDTI</div><div class="value">${metrics.FEDTI || 'N/A'}</div></div>`;
+                html += '</div>';
+                
+                if (metrics.FEDTI && metrics.FEDTI !== 'N/A') {
+                    html += '<div class="test-result success">✓ FEDTI is properly calculated and returned</div>';
+                    html += `<div class="test-result success">FEDTI Value: ${metrics.FEDTI}</div>`;
+                } else {
+                    html += '<div class="test-result error">✗ FEDTI is missing or undefined</div>';
+                }
+                
+                // Show eligibility status
+                const status = result.eligibility_overall ? 'APPROVED' : 'DENIED';
+                const statusClass = result.eligibility_overall ? 'success' : 'error';
+                html += `<div class="test-result ${statusClass}">Loan Status: ${status}</div>`;
+                
+                resultsDiv.innerHTML = html;
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="test-result error">✗ Test failed: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
