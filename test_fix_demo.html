@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Failed Rules Fix Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .before, .after { border: 1px solid #ccc; padding: 15px; margin: 10px 0; }
+        .before { background: #ffe6e6; }
+        .after { background: #e6ffe6; }
+        .failed-rules { margin-top: 15px; }
+        .failed-rules ul { list-style: none; padding: 0; }
+        .failed-rules li { margin: 5px 0; padding: 8px; background: white; border-left: 3px solid #e74c3c; }
+        .rules-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px; margin-top: 15px; }
+        .rule-item { padding: 12px; border-radius: 6px; border-left: 4px solid; }
+        .rule-item.passed { background: #d5f4e6; border-left-color: #27ae60; }
+        .rule-item.failed { background: #ffeaa7; border-left-color: #e17055; }
+        .rule-header { display: flex; align-items: center; margin-bottom: 6px; }
+        .rule-status { font-weight: bold; margin-right: 8px; }
+        .rule-name { font-weight: 600; }
+        .rule-messages { font-size: 0.9em; color: #555; }
+    </style>
+</head>
+<body>
+    <h1>Mortgage Eligibility App - Failed Rules Display Fix</h1>
+    
+    <h2>Problem Fixed</h2>
+    <p>The mortgage eligibility app was showing "[object Object]" instead of meaningful rule failure information.</p>
+    
+    <div class="before">
+        <h3>❌ Before (Broken Display)</h3>
+        <div class="failed-rules">
+            <h4>Failed Rules</h4>
+            <ul>
+                <li>[object Object]</li>
+                <li>[object Object]</li>
+                <li>[object Object]</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="after">
+        <h3>✅ After (Fixed Display)</h3>
+        <div class="failed-rules">
+            <h4>Failed Rules</h4>
+            <ul>
+                <li><strong>CREDIT_SCORE:</strong> Credit score 500 below minimum 620</li>
+                <li><strong>DTI:</strong> DTI 184.32% exceeds DU max 50.00%</li>
+                <li><strong>MORTGAGE_INSURANCE:</strong> MI required for LTV 95.00% (min 30% coverage)</li>
+            </ul>
+        </div>
+        
+        <h4>All Rules Summary</h4>
+        <div class="rules-grid">
+            <div class="rule-item passed">
+                <div class="rule-header">
+                    <span class="rule-status">✓</span>
+                    <span class="rule-name">LTV_CLTV_HCLTV</span>
+                </div>
+                <div class="rule-messages">LTV/CLTV/HCLTV within limits</div>
+            </div>
+            <div class="rule-item failed">
+                <div class="rule-header">
+                    <span class="rule-status">✗</span>
+                    <span class="rule-name">CREDIT_SCORE</span>
+                </div>
+                <div class="rule-messages">Credit score 500 below minimum 620</div>
+            </div>
+            <div class="rule-item failed">
+                <div class="rule-header">
+                    <span class="rule-status">✗</span>
+                    <span class="rule-name">DTI</span>
+                </div>
+                <div class="rule-messages">DTI 184.32% exceeds DU max 50.00%</div>
+            </div>
+            <div class="rule-item passed">
+                <div class="rule-header">
+                    <span class="rule-status">✓</span>
+                    <span class="rule-name">PROPERTY_TYPE</span>
+                </div>
+                <div class="rule-messages">Property type SFR acceptable</div>
+            </div>
+        </div>
+    </div>
+    
+    <h2>What Was Fixed</h2>
+    <ol>
+        <li><strong>JavaScript Display Logic:</strong> Updated <code>app.js</code> to properly extract <code>rule_name</code> and <code>messages</code> from rule objects</li>
+        <li><strong>Enhanced UI:</strong> Added comprehensive rules display showing all rules with pass/fail status</li>
+        <li><strong>Better Styling:</strong> Added CSS for clear visual distinction between passed and failed rules</li>
+    </ol>
+    
+    <h2>Technical Details</h2>
+    <p>The issue was in the <code>displayResults</code> function in <code>app.js</code>:</p>
+    <pre><code>// Before (broken):
+result.failed_rules.forEach(rule => {
+    html += `&lt;li&gt;${rule}&lt;/li&gt;`;  // rule is an object, shows [object Object]
+});
+
+// After (fixed):
+result.failed_rules.forEach(rule => {
+    html += `&lt;li&gt;&lt;strong&gt;${rule.rule_name}:&lt;/strong&gt; ${rule.messages.join(', ')}&lt;/li&gt;`;
+});</code></pre>
+    
+    <p><strong>Live Application:</strong> <a href="https://d3eli7luy051tr.cloudfront.net" target="_blank">https://d3eli7luy051tr.cloudfront.net</a></p>
+</body>
+</html>
