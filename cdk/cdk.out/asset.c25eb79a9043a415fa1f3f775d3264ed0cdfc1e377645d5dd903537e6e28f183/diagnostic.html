@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnostic Page</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 { color: #4ec9b0; }
+        .test-section {
+            background: #252526;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #007acc;
+        }
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 10px 10px 10px 0;
+            border-radius: 4px;
+        }
+        button:hover { background: #005a9e; }
+        .result {
+            background: #1e1e1e;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-size: 12px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .success { color: #4ec9b0; }
+        .error { color: #f48771; }
+        .warning { color: #dcdcaa; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Mortgage Engine Diagnostics</h1>
+    <p>This page will help diagnose connectivity issues with the API endpoints.</p>
+
+    <div class="test-section">
+        <h2>1. Basic Connectivity Tests</h2>
+        <button onclick="testHomepage()">Test Homepage</button>
+        <button onclick="testPresets()">Test Presets API</button>
+        <button onclick="testEvaluate()">Test Evaluate API</button>
+        <button onclick="runAllTests()">Run All Tests</button>
+        <button onclick="clearResults()">Clear Results</button>
+        <div id="results1" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Current Page Info</h2>
+        <button onclick="showPageInfo()">Show Page Info</button>
+        <div id="results2" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. CORS & Headers Test</h2>
+        <button onclick="testCORS()">Test CORS Headers</button>
+        <div id="results3" class="result"></div>
+    </div>
+
+    <script>
+        function log(containerId, message, type = 'log') {
+            const container = document.getElementById(containerId);
+            const line = document.createElement('div');
+            line.className = type;
+            line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            container.appendChild(line);
+            console.log(message);
+        }
+
+        function clearResults() {
+            document.getElementById('results1').innerHTML = '';
+            document.getElementById('results2').innerHTML = '';
+            document.getElementById('results3').innerHTML = '';
+        }
+
+        async function testHomepage() {
+            log('results1', '=== Testing Homepage ===');
+            try {
+                const response = await fetch('/', {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                });
+
+                log('results1', `Status: ${response.status}`, response.ok ? 'success' : 'error');
+                log('results1', `Content-Type: ${response.headers.get('content-type')}`);
+                log('results1', `URL: ${response.url}`);
+
+                const text = await response.text();
+                log('results1', `Response length: ${text.length} bytes`);
+                log('results1', `First 100 chars: ${text.substring(0, 100)}`, 'success');
+            } catch (error) {
+                log('results1', `ERROR: ${error.message}`, 'error');
+            }
+        }
+
+        async function testPresets() {
+            log('results1', '\n=== Testing Presets API ===');
+            try {
+                log('results1', 'Fetching /api/presets...');
+
+                const response = await fetch('/api/presets', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    },
+                    credentials: 'same-origin'
+                });
+
+                log('results1', `Status: ${response.status}`, response.ok ? 'success' : 'error');
+                log('results1', `Content-Type: ${response.headers.get('content-type')}`);
+                log('results1', `URL: ${response.url}`);
+
+                const text = await response.text();
+                log('results1', `Response length: ${text.length} bytes`);
+                log('results1', `First 100 chars: ${text.substring(0, 100)}`);
+                log('results1', `Last 50 chars: ${text.substring(Math.max(0, text.length - 50))}`);
+
+                // Try to parse as JSON
+                if (text.trim().startsWith('{')) {
+                    const json = JSON.parse(text);
+                    log('results1', `✓ Valid JSON! Keys: ${Object.keys(json).join(', ')}`, 'success');
+                } else if (text.trim().startsWith('<!')) {
+                    log('results1', '✗ Response is HTML, not JSON!', 'error');
+                    log('results1', 'HTML content:', 'error');
+                    log('results1', text.substring(0, 500), 'error');
+                } else {
+                    log('results1', '✗ Response is neither JSON nor HTML', 'error');
+                }
+            } catch (error) {
+                log('results1', `ERROR: ${error.message}`, 'error');
+                log('results1', `Stack: ${error.stack}`, 'error');
+            }
+        }
+
+        async function testEvaluate() {
+            log('results1', '\n=== Testing Evaluate API ===');
+            try {
+                const testData = {
+                    credit_score: 760,
+                    gross_monthly_income: 10000,
+                    monthly_debts: 650,
+                    num_financed_properties: 1,
+                    first_time_homebuyer: false,
+                    owns_property_last_3yrs: true,
+                    liquid_assets: 50000,
+                    ami_ratio: '',
+                    purchase_price: 400000,
+                    appraised_value: 400000,
+                    units: 1,
+                    property_type: 'SFR',
+                    occupancy: 'primary',
+                    condition_rating: 'C3',
+                    is_high_cost_area: true,
+                    loan_amount: 300000,
+                    note_rate: 6.50,
+                    term_months: 360,
+                    purpose: 'purchase',
+                    mi_type: '',
+                    mi_coverage_pct: ''
+                };
+
+                log('results1', 'Posting to /api/evaluate...');
+
+                const response = await fetch('/api/evaluate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(testData)
+                });
+
+                log('results1', `Status: ${response.status}`, response.ok ? 'success' : 'error');
+                log('results1', `Content-Type: ${response.headers.get('content-type')}`);
+                log('results1', `URL: ${response.url}`);
+
+                const text = await response.text();
+                log('results1', `Response length: ${text.length} bytes`);
+                log('results1', `First 200 chars: ${text.substring(0, 200)}`);
+
+                if (text.includes('CSRF')) {
+                    log('results1', '✗ CSRF TOKEN ERROR DETECTED!', 'error');
+                    log('results1', 'Full response:', 'error');
+                    log('results1', text, 'error');
+                } else if (text.trim().startsWith('{')) {
+                    const json = JSON.parse(text);
+                    log('results1', '✓ Valid JSON response!', 'success');
+                    log('results1', `Eligibility: ${json.eligibility_overall ? 'APPROVED' : 'DENIED'}`, 'success');
+                    log('results1', `LTV: ${json.calculated_metrics.LTV}`, 'success');
+                } else if (text.trim().startsWith('<!')) {
+                    log('results1', '✗ Response is HTML, not JSON!', 'error');
+                    log('results1', text.substring(0, 500), 'error');
+                } else {
+                    log('results1', '✗ Unknown response format', 'error');
+                    log('results1', text, 'error');
+                }
+            } catch (error) {
+                log('results1', `ERROR: ${error.message}`, 'error');
+                log('results1', `Stack: ${error.stack}`, 'error');
+            }
+        }
+
+        async function runAllTests() {
+            clearResults();
+            await testHomepage();
+            await new Promise(r => setTimeout(r, 500));
+            await testPresets();
+            await new Promise(r => setTimeout(r, 500));
+            await testEvaluate();
+            log('results1', '\n=== All tests completed ===', 'success');
+        }
+
+        function showPageInfo() {
+            document.getElementById('results2').innerHTML = '';
+            log('results2', '=== Current Page Information ===');
+            log('results2', `Protocol: ${window.location.protocol}`);
+            log('results2', `Hostname: ${window.location.hostname}`);
+            log('results2', `Port: ${window.location.port}`);
+            log('results2', `Pathname: ${window.location.pathname}`);
+            log('results2', `Full URL: ${window.location.href}`);
+            log('results2', `Origin: ${window.location.origin}`);
+            log('results2', `User Agent: ${navigator.userAgent}`);
+            log('results2', `Online: ${navigator.onLine}`);
+            log('results2', `Cookies enabled: ${navigator.cookieEnabled}`);
+        }
+
+        async function testCORS() {
+            document.getElementById('results3').innerHTML = '';
+            log('results3', '=== CORS & Headers Test ===');
+
+            try {
+                const response = await fetch('/api/presets', {
+                    method: 'OPTIONS'
+                });
+
+                log('results3', `OPTIONS Status: ${response.status}`);
+                log('results3', '\nAll Response Headers:');
+                for (const [key, value] of response.headers.entries()) {
+                    log('results3', `  ${key}: ${value}`);
+                }
+            } catch (error) {
+                log('results3', `ERROR: ${error.message}`, 'error');
+            }
+        }
+
+        // Run tests on load
+        window.addEventListener('load', () => {
+            log('results1', 'Page loaded. Click "Run All Tests" to begin.', 'warning');
+        });
+    </script>
+</body>
+</html>

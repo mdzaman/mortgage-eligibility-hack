@@ -1,0 +1,32 @@
+{
+  "version": "40.0.0",
+  "files": {
+    "5c0fa958105784671ef69d23b3c48069909de57d1d8c2e96b95789e1ba3ce0a7": {
+      "source": {
+        "path": "asset.5c0fa958105784671ef69d23b3c48069909de57d1d8c2e96b95789e1ba3ce0a7",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "current_account-current_region": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
+          "objectKey": "5c0fa958105784671ef69d23b3c48069909de57d1d8c2e96b95789e1ba3ce0a7.zip",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
+        }
+      }
+    },
+    "ea77e93f77e222ac9433a150685e697d63cb4d28995f04c6a55f267de327fd25": {
+      "source": {
+        "path": "MortgageEligibilityStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-current_region": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
+          "objectKey": "ea77e93f77e222ac9433a150685e697d63cb4d28995f04c6a55f267de327fd25.json",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}
