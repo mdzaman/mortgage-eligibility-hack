@@ -63,81 +63,17 @@ class MortgageHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
-            presets = {
-                'prime_conforming': {
-                    'name': 'Prime Conforming Purchase',
-                    'credit_score': 760,
-                    'gross_monthly_income': 10000,
-                    'monthly_debts': 650,
-                    'num_financed_properties': 1,
-                    'first_time_homebuyer': False,
-                    'owns_property_last_3yrs': True,
-                    'liquid_assets': 50000,
-                    'ami_ratio': '',
-                    'purchase_price': 400000,
-                    'appraised_value': 400000,
-                    'units': 1,
-                    'property_type': 'SFR',
-                    'occupancy': 'primary',
-                    'condition_rating': 'C3',
-                    'is_high_cost_area': True,
-                    'loan_amount': 300000,
-                    'note_rate': 6.50,
-                    'term_months': 360,
-                    'purpose': 'purchase',
-                    'mi_type': '',
-                    'mi_coverage_pct': ''
-                },
-                'fthb_high_ltv': {
-                    'name': 'First-Time Homebuyer (97% LTV)',
-                    'credit_score': 700,
-                    'gross_monthly_income': 6000,
-                    'monthly_debts': 300,
-                    'num_financed_properties': 1,
-                    'first_time_homebuyer': True,
-                    'owns_property_last_3yrs': False,
-                    'liquid_assets': 10000,
-                    'ami_ratio': 0.85,
-                    'purchase_price': 300000,
-                    'appraised_value': 300000,
-                    'units': 1,
-                    'property_type': 'SFR',
-                    'occupancy': 'primary',
-                    'condition_rating': 'C3',
-                    'is_high_cost_area': False,
-                    'loan_amount': 291000,
-                    'note_rate': 6.75,
-                    'term_months': 360,
-                    'purpose': 'purchase',
-                    'mi_type': 'borrower_paid_monthly',
-                    'mi_coverage_pct': 0.35
-                },
-                'investment_cashout': {
-                    'name': 'Investment Cash-Out Refi',
-                    'credit_score': 740,
-                    'gross_monthly_income': 15000,
-                    'monthly_debts': 3500,
-                    'num_financed_properties': 4,
-                    'first_time_homebuyer': False,
-                    'owns_property_last_3yrs': True,
-                    'liquid_assets': 100000,
-                    'ami_ratio': '',
-                    'purchase_price': '',
-                    'appraised_value': 500000,
-                    'units': 1,
-                    'property_type': 'SFR',
-                    'occupancy': 'investment',
-                    'condition_rating': 'C2',
-                    'is_high_cost_area': False,
-                    'loan_amount': 375000,
-                    'note_rate': 7.00,
-                    'term_months': 360,
-                    'purpose': 'cash_out_refi',
-                    'mi_type': '',
-                    'mi_coverage_pct': ''
-                }
-            }
-            self.wfile.write(json.dumps(presets).encode())
+            # Load presets from presets.json file
+            try:
+                with open('presets.json', 'r') as f:
+                    presets = json.load(f)
+                self.wfile.write(json.dumps(presets).encode())
+            except FileNotFoundError:
+                error = {"error": "presets.json file not found"}
+                self.wfile.write(json.dumps(error).encode())
+            except json.JSONDecodeError:
+                error = {"error": "Invalid JSON in presets.json"}
+                self.wfile.write(json.dumps(error).encode())
 
         else:
             self.send_response(404)
@@ -312,4 +248,6 @@ def run_server(port=3000):
 
 
 if __name__ == '__main__':
-    run_server()
+    import os
+    port = int(os.environ.get('PORT', 3000))
+    run_server(port)

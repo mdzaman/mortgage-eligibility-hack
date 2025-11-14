@@ -13,6 +13,7 @@ from mortgage_engine import (
 )
 
 app = Flask(__name__)
+app.config['WTF_CSRF_ENABLED'] = False
 
 
 @app.route('/')
@@ -20,8 +21,14 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/api/evaluate', methods=['POST'])
+@app.route('/api/evaluate', methods=['POST', 'OPTIONS'])
 def evaluate():
+    if request.method == 'OPTIONS':
+        response = jsonify({})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.headers.add('Access-Control-Allow-Methods', 'POST, OPTIONS')
+        return response
     try:
         data = request.json
 
@@ -126,14 +133,24 @@ def evaluate():
             ]
         }
 
-        return jsonify(response)
+        response_data = jsonify(response)
+        response_data.headers.add('Access-Control-Allow-Origin', '*')
+        return response_data
 
     except Exception as e:
-        return jsonify({'error': str(e)}), 400
+        error_response = jsonify({'error': str(e)})
+        error_response.headers.add('Access-Control-Allow-Origin', '*')
+        return error_response, 400
 
 
-@app.route('/api/presets')
+@app.route('/api/presets', methods=['GET', 'OPTIONS'])
 def get_presets():
+    if request.method == 'OPTIONS':
+        response = jsonify({})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.headers.add('Access-Control-Allow-Methods', 'GET, OPTIONS')
+        return response
     """Return preset scenarios for quick testing."""
     presets = {
         'prime_conforming': {
@@ -209,8 +226,12 @@ def get_presets():
             'mi_coverage_pct': ''
         }
     }
-    return jsonify(presets)
+    response_data = jsonify(presets)
+    response_data.headers.add('Access-Control-Allow-Origin', '*')
+    return response_data
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=3000, debug=True)
+    import os
+    port = int(os.environ.get('PORT', 8080))
+    app.run(host='0.0.0.0', port=port, debug=True)
