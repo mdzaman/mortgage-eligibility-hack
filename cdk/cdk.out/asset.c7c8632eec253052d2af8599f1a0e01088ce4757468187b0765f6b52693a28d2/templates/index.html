@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mortgage Eligibility & Pricing Engine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .card h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-section {
+            margin-bottom: 25px;
+        }
+
+        .form-section h3 {
+            color: #764ba2;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .results {
+            overflow-y: auto;
+            max-height: calc(100vh - 100px);
+        }
+
+        .result-status {
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        .result-status.approved {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+
+        .result-status.denied {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+
+        .metric-card .label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .metric-card .value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .flags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .flag {
+            background: #667eea;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .pricing-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .pricing-header {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .pricing-item {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid #764ba2;
+        }
+
+        .pricing-item .label {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .pricing-item .value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .llpa-components {
+            margin-top: 15px;
+        }
+
+        .llpa-component {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .llpa-component .name {
+            font-weight: 500;
+        }
+
+        .llpa-component .value {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .llpa-component .value.negative {
+            color: #28a745;
+        }
+
+        .failed-rules {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .failed-rules h3 {
+            color: #721c24;
+            margin-bottom: 10px;
+        }
+
+        .failed-rule {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+        }
+
+        .failed-rule .rule-name {
+            font-weight: bold;
+            color: #dc3545;
+            margin-bottom: 5px;
+        }
+
+        .failed-rule .message {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .accordion {
+            margin-top: 20px;
+        }
+
+        .accordion-header {
+            background: #667eea;
+            color: white;
+            padding: 12px 15px;
+            cursor: pointer;
+            border-radius: 6px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .accordion-header:hover {
+            background: #5568d3;
+        }
+
+        .accordion-content {
+            display: none;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .accordion-content.active {
+            display: block;
+        }
+
+        .rule-item {
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .rule-item.passed {
+            border-left: 4px solid #28a745;
+        }
+
+        .rule-item.failed {
+            border-left: 4px solid #dc3545;
+        }
+
+        .rule-status {
+            font-weight: bold;
+        }
+
+        .rule-status.passed {
+            color: #28a745;
+        }
+
+        .rule-status.failed {
+            color: #dc3545;
+        }
+
+        /* Preset radio button styles */
+        .preset-option {
+            display: block;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .preset-option:hover {
+            background: #f0f0f0;
+            border-color: #667eea;
+        }
+
+        .preset-option input[type="radio"] {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .preset-option input[type="radio"]:checked + .preset-content {
+            color: #667eea;
+        }
+
+        .preset-option:has(input[type="radio"]:checked) {
+            background: #e8f0fe;
+            border-color: #667eea;
+        }
+
+        .preset-content {
+            display: inline-block;
+            width: calc(100% - 30px);
+        }
+
+        .preset-desc {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 Mortgage Eligibility & Pricing Engine</h1>
+            <p>Evaluate mortgage scenarios against 16 Fannie Mae eligibility dimensions</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Input Form -->
+            <div class="card">
+                <h2>Loan Scenario</h2>
+
+                <!-- Preset Selection -->
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 15px; color: #764ba2;">📋 Quick Start - Select a Preset</h3>
+
+                    <div style="margin-bottom: 15px;">
+                        <label class="preset-option">
+                            <input type="radio" name="preset" value="prime_conforming">
+                            <div class="preset-content">
+                                <strong>📊 Prime Conforming Purchase</strong>
+                                <div class="preset-desc">
+                                    760 FICO • 75% LTV • Primary Residence • $300K Loan • Expected: APPROVED
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="preset-option">
+                            <input type="radio" name="preset" value="fthb_high_ltv">
+                            <div class="preset-content">
+                                <strong>🏠 First-Time Homebuyer (97% LTV)</strong>
+                                <div class="preset-desc">
+                                    700 FICO • 97% LTV • First-Time Buyer • AMI Waiver • Expected: APPROVED
+                                </div>
+                            </div>
+                        </label>
+
+                        <label class="preset-option">
+                            <input type="radio" name="preset" value="investment_cashout">
+                            <div class="preset-content">
+                                <strong>💼 Investment Property Cash-Out</strong>
+                                <div class="preset-desc">
+                                    740 FICO • 75% LTV • Investment • 4 Properties • Expected: APPROVED with HPML
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <button type="button" id="loadPresetButton" class="btn btn-primary" onclick="loadAndEvaluatePreset()" style="width: 100%;" disabled>
+                        ⏳ Loading presets...
+                    </button>
+                </div>
+
+                <form id="mortgageForm">
+                    <!-- Borrower Section -->
+                    <div class="form-section">
+                        <h3>👤 Borrower Information</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Credit Score (FICO)</label>
+                                <input type="number" id="credit_score" required min="300" max="850" value="740">
+                            </div>
+                            <div class="form-group">
+                                <label>Monthly Income</label>
+                                <input type="number" id="gross_monthly_income" required step="0.01" value="10000">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Monthly Debts</label>
+                                <input type="number" id="monthly_debts" step="0.01" value="650">
+                            </div>
+                            <div class="form-group">
+                                <label>Liquid Assets (After Closing)</label>
+                                <input type="number" id="liquid_assets" required step="0.01" value="50000">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Financed Properties</label>
+                                <input type="number" id="num_financed_properties" required min="1" max="10" value="1">
+                            </div>
+                            <div class="form-group">
+                                <label>AMI Ratio (optional, for FTHB waiver)</label>
+                                <input type="number" id="ami_ratio" step="0.01" min="0" max="3" placeholder="0.85">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group checkbox-group">
+                                <input type="checkbox" id="first_time_homebuyer">
+                                <label>First-Time Homebuyer</label>
+                            </div>
+                            <div class="form-group checkbox-group">
+                                <input type="checkbox" id="owns_property_last_3yrs" checked>
+                                <label>Owned Property Last 3 Years</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Property Section -->
+                    <div class="form-section">
+                        <h3>🏡 Property Information</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Purchase Price (leave blank for refi)</label>
+                                <input type="number" id="purchase_price" step="0.01" value="400000">
+                            </div>
+                            <div class="form-group">
+                                <label>Appraised Value</label>
+                                <input type="number" id="appraised_value" required step="0.01" value="400000">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Units</label>
+                                <select id="units" required>
+                                    <option value="1" selected>1 Unit</option>
+                                    <option value="2">2 Units</option>
+                                    <option value="3">3 Units</option>
+                                    <option value="4">4 Units</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Property Type</label>
+                                <select id="property_type" required>
+                                    <option value="SFR" selected>Single Family</option>
+                                    <option value="Condo">Condo</option>
+                                    <option value="Coop">Co-op</option>
+                                    <option value="PUD">PUD</option>
+                                    <option value="Manufactured">Manufactured</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Occupancy</label>
+                                <select id="occupancy" required>
+                                    <option value="primary" selected>Primary Residence</option>
+                                    <option value="second_home">Second Home</option>
+                                    <option value="investment">Investment</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Condition Rating</label>
+                                <select id="condition_rating" required>
+                                    <option value="C1">C1 - Excellent</option>
+                                    <option value="C2">C2 - Very Good</option>
+                                    <option value="C3" selected>C3 - Good</option>
+                                    <option value="C4">C4 - Fair</option>
+                                    <option value="C5">C5 - Poor</option>
+                                    <option value="C6">C6 - Very Poor</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="is_high_cost_area">
+                            <label>High-Cost Area</label>
+                        </div>
+                    </div>
+
+                    <!-- Loan Section -->
+                    <div class="form-section">
+                        <h3>💰 Loan Terms</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Loan Amount</label>
+                                <input type="number" id="loan_amount" required step="0.01" value="300000">
+                            </div>
+                            <div class="form-group">
+                                <label>Note Rate (%)</label>
+                                <input type="number" id="note_rate" required step="0.01" min="0" max="20" value="6.50">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Term (months)</label>
+                                <select id="term_months" required>
+                                    <option value="360" selected>360 (30 years)</option>
+                                    <option value="180">180 (15 years)</option>
+                                    <option value="240">240 (20 years)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Purpose</label>
+                                <select id="purpose" required>
+                                    <option value="purchase" selected>Purchase</option>
+                                    <option value="rate_term_refi">Rate/Term Refi</option>
+                                    <option value="cash_out_refi">Cash-Out Refi</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MI Section -->
+                    <div class="form-section">
+                        <h3>🛡️ Mortgage Insurance (if LTV > 80%)</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>MI Type</label>
+                                <select id="mi_type">
+                                    <option value="">None</option>
+                                    <option value="borrower_paid_monthly">Borrower Paid Monthly</option>
+                                    <option value="lender_paid">Lender Paid</option>
+                                    <option value="single">Single Premium</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>MI Coverage (e.g., 0.25 for 25%)</label>
+                                <input type="number" id="mi_coverage_pct" step="0.01" min="0" max="1" placeholder="0.25">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Evaluate Scenario</button>
+
+                    <div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 6px; border: 1px solid #ffc107;">
+                        <strong>🧪 Debug Mode:</strong>
+                        <button type="button" class="btn btn-secondary" onclick="manualTest()" style="margin-top: 10px; width: 100%;">
+                            🔬 Run Manual Test (Hardcoded Values)
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Results -->
+            <div class="card results">
+                <h2>Evaluation Results</h2>
+
+                <div id="loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>Evaluating scenario...</p>
+                </div>
+
+                <div id="emptyState" class="empty-state">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <h3>No Results Yet</h3>
+                    <p>Fill out the form and click "Evaluate Scenario" to see results</p>
+                </div>
+
+                <div id="results" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let presets = {};
+        let presetsLoaded = false;
+
+        // Load presets on page load
+        async function loadPresets() {
+            console.log('Fetching presets from /api/presets...');
+
+            // Disable the button while loading
+            const loadButton = document.getElementById('loadPresetButton');
+            if (loadButton) {
+                loadButton.disabled = true;
+                loadButton.textContent = '⏳ Loading presets...';
+            }
+
+            try {
+                const response = await fetch('/api/presets', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    },
+                    credentials: 'same-origin'
+                });
+                console.log('Presets response status:', response.status);
+                console.log('Presets response content-type:', response.headers.get('content-type'));
+
+                // Get response text first to check what we actually received
+                const responseText = await response.text();
+                console.log('Presets response length:', responseText.length);
+                console.log('Presets response first 200 chars:', responseText.substring(0, 200));
+
+                if (!response.ok) {
+                    console.error('Presets request failed with status:', response.status);
+                    console.error('Response body:', responseText);
+                    throw new Error(`HTTP error! status: ${response.status}\nResponse: ${responseText.substring(0, 100)}`);
+                }
+
+                // Check if response is actually JSON
+                if (!responseText.trim().startsWith('{')) {
+                    console.error('Response is not JSON, starts with:', responseText.substring(0, 50));
+                    throw new Error('Server returned non-JSON response (got HTML or other content)');
+                }
+
+                presets = JSON.parse(responseText);
+                presetsLoaded = true;
+                console.log('Presets loaded successfully:', Object.keys(presets));
+
+                // Enable the button
+                if (loadButton) {
+                    loadButton.disabled = false;
+                    loadButton.textContent = '⚡ Load Selected Preset & Evaluate';
+                }
+
+                return true;
+            } catch (error) {
+                console.error('Failed to load presets:', error);
+                presetsLoaded = false;
+
+                if (loadButton) {
+                    loadButton.disabled = true;
+                    loadButton.textContent = '❌ Failed to load presets - Refresh page';
+                }
+
+                alert('Failed to load presets. Please refresh the page and try again.\n\nError: ' + error.message);
+                return false;
+            }
+        }
+
+        // Load presets when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            loadPresets();
+        });
+
+        function loadAndEvaluatePreset() {
+            console.log('loadAndEvaluatePreset called');
+
+            // Check if presets are loaded
+            if (!presetsLoaded || Object.keys(presets).length === 0) {
+                alert('Presets are still loading. Please wait a moment and try again.');
+                return;
+            }
+
+            // Get selected radio button
+            const selectedRadio = document.querySelector('input[name="preset"]:checked');
+
+            if (!selectedRadio) {
+                alert('Please select a preset scenario first!');
+                return;
+            }
+
+            const presetName = selectedRadio.value;
+            console.log('Selected preset:', presetName);
+
+            loadPreset(presetName);
+        }
+
+        function loadPreset(presetName) {
+            console.log('Loading preset:', presetName);
+            console.log('Available presets:', Object.keys(presets));
+            console.log('Presets loaded flag:', presetsLoaded);
+
+            if (!presetsLoaded) {
+                console.error('Presets not loaded yet');
+                alert('Presets are still loading. Please wait a moment and try again.');
+                return;
+            }
+
+            const preset = presets[presetName];
+            if (!preset) {
+                console.error('Preset not found:', presetName);
+                console.error('Available presets:', presets);
+                alert(`Preset "${presetName}" not found. Available presets: ${Object.keys(presets).join(', ')}`);
+                return;
+            }
+
+            console.log('Loading preset data:', preset);
+
+            // Populate all form fields
+            document.getElementById('credit_score').value = preset.credit_score;
+            document.getElementById('gross_monthly_income').value = preset.gross_monthly_income;
+            document.getElementById('monthly_debts').value = preset.monthly_debts;
+            document.getElementById('num_financed_properties').value = preset.num_financed_properties;
+            document.getElementById('first_time_homebuyer').checked = preset.first_time_homebuyer;
+            document.getElementById('owns_property_last_3yrs').checked = preset.owns_property_last_3yrs;
+            document.getElementById('liquid_assets').value = preset.liquid_assets;
+            document.getElementById('ami_ratio').value = preset.ami_ratio || '';
+
+            document.getElementById('purchase_price').value = preset.purchase_price || '';
+            document.getElementById('appraised_value').value = preset.appraised_value;
+            document.getElementById('units').value = preset.units;
+            document.getElementById('property_type').value = preset.property_type;
+            document.getElementById('occupancy').value = preset.occupancy;
+            document.getElementById('condition_rating').value = preset.condition_rating;
+            document.getElementById('is_high_cost_area').checked = preset.is_high_cost_area;
+
+            document.getElementById('loan_amount').value = preset.loan_amount;
+            document.getElementById('note_rate').value = preset.note_rate;
+            document.getElementById('term_months').value = preset.term_months;
+            document.getElementById('purpose').value = preset.purpose;
+
+            document.getElementById('mi_type').value = preset.mi_type || '';
+            document.getElementById('mi_coverage_pct').value = preset.mi_coverage_pct || '';
+
+            console.log('Preset loaded successfully. Submitting form...');
+
+            // Submit the form
+            setTimeout(() => {
+                const form = document.getElementById('mortgageForm');
+                const submitEvent = new Event('submit', {
+                    bubbles: true,
+                    cancelable: true
+                });
+                form.dispatchEvent(submitEvent);
+            }, 100);
+        }
+
+        document.getElementById('mortgageForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            console.log('Form submitted');
+
+            // Show loading
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('results').style.display = 'none';
+
+            // Collect form data
+            const formData = {
+                credit_score: document.getElementById('credit_score').value,
+                gross_monthly_income: document.getElementById('gross_monthly_income').value,
+                monthly_debts: document.getElementById('monthly_debts').value,
+                num_financed_properties: document.getElementById('num_financed_properties').value,
+                first_time_homebuyer: document.getElementById('first_time_homebuyer').checked,
+                owns_property_last_3yrs: document.getElementById('owns_property_last_3yrs').checked,
+                liquid_assets: document.getElementById('liquid_assets').value,
+                ami_ratio: document.getElementById('ami_ratio').value,
+
+                purchase_price: document.getElementById('purchase_price').value,
+                appraised_value: document.getElementById('appraised_value').value,
+                units: document.getElementById('units').value,
+                property_type: document.getElementById('property_type').value,
+                occupancy: document.getElementById('occupancy').value,
+                condition_rating: document.getElementById('condition_rating').value,
+                is_high_cost_area: document.getElementById('is_high_cost_area').checked,
+
+                loan_amount: document.getElementById('loan_amount').value,
+                note_rate: document.getElementById('note_rate').value,
+                term_months: document.getElementById('term_months').value,
+                purpose: document.getElementById('purpose').value,
+
+                mi_type: document.getElementById('mi_type').value,
+                mi_coverage_pct: document.getElementById('mi_coverage_pct').value
+            };
+
+            console.log('Form data:', formData);
+
+            try {
+                console.log('Sending request to /api/evaluate...');
+                const response = await fetch('/api/evaluate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(formData)
+                });
+
+                console.log('Response status:', response.status);
+                console.log('Response content-type:', response.headers.get('content-type'));
+                console.log('Response headers:', [...response.headers.entries()]);
+
+                // Check if response is ok
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Server returned error:', response.status, errorText);
+                    throw new Error(`Server error ${response.status}: ${errorText.substring(0, 100)}`);
+                }
+
+                // Get the response text first
+                const responseText = await response.text();
+                console.log('Response text length:', responseText.length);
+                console.log('Response text first 200 chars:', responseText.substring(0, 200));
+                console.log('Response text last 50 chars:', responseText.substring(Math.max(0, responseText.length - 50)));
+
+                // Check if response looks like JSON
+                if (!responseText.trim().startsWith('{')) {
+                    console.error('Response does not start with {');
+                    console.error('Full response text:', responseText);
+                    throw new Error('Server returned non-JSON response. Check console for full text.');
+                }
+
+                // Try to parse as JSON
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                    console.log('✓ Successfully parsed JSON');
+                } catch (parseError) {
+                    console.error('JSON parse error:', parseError);
+                    console.error('Full response text:', responseText);
+                    console.error('Response starts with:', responseText.substring(0, 50));
+                    throw new Error('Invalid JSON response from server. Check console for full response text.');
+                }
+
+                console.log('Result:', result);
+
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+
+                console.log('Calling displayResults...');
+                displayResults(result);
+                console.log('displayResults completed');
+            } catch (error) {
+                console.error('Error occurred:', error);
+                alert('Error: ' + error.message);
+            } finally {
+                document.getElementById('loading').classList.remove('active');
+            }
+        });
+
+        function displayResults(result) {
+            console.log('displayResults called with:', result);
+            const resultsDiv = document.getElementById('results');
+            console.log('Results div:', resultsDiv);
+            resultsDiv.style.display = 'block';
+            console.log('Results div display set to block');
+
+            const statusClass = result.eligibility_overall ? 'approved' : 'denied';
+            const statusText = result.eligibility_overall ? '✓ APPROVED' : '✗ DENIED';
+
+            let html = `
+                <div class="result-status ${statusClass}">${statusText}</div>
+            `;
+
+            // Metrics
+            html += `
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="label">LTV</div>
+                        <div class="value">${result.calculated_metrics.LTV}</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="label">CLTV</div>
+                        <div class="value">${result.calculated_metrics.CLTV}</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="label">DTI</div>
+                        <div class="value">${result.calculated_metrics.DTI}</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="label">Channel</div>
+                        <div class="value">${result.calculated_metrics.channel}</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="label">Reserves</div>
+                        <div class="value">${result.calculated_metrics.reserves_required}</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="label">Reserve Months</div>
+                        <div class="value">${result.calculated_metrics.reserves_months}</div>
+                    </div>
+                </div>
+            `;
+
+            // Flags
+            const activeFlags = Object.entries(result.flags).filter(([_, value]) => value);
+            if (activeFlags.length > 0) {
+                html += `<div class="flags">`;
+                activeFlags.forEach(([flag, _]) => {
+                    html += `<span class="flag">${flag}</span>`;
+                });
+                html += `</div>`;
+            }
+
+            // Failed Rules
+            if (result.failed_rules.length > 0) {
+                html += `<div class="failed-rules">
+                    <h3>Failed Rules</h3>`;
+                result.failed_rules.forEach(rule => {
+                    html += `<div class="failed-rule">
+                        <div class="rule-name">${rule.rule_name}</div>
+                        ${rule.messages.map(msg => `<div class="message">• ${msg}</div>`).join('')}
+                    </div>`;
+                });
+                html += `</div>`;
+            }
+
+            // Pricing
+            html += `
+                <div class="pricing-section">
+                    <h3 style="margin-bottom: 15px;">💵 Pricing Details</h3>
+                    <div class="pricing-header">
+                        <div class="pricing-item">
+                            <div class="label">Base Rate</div>
+                            <div class="value">${result.pricing.base_rate}</div>
+                        </div>
+                        <div class="pricing-item">
+                            <div class="label">Base Price</div>
+                            <div class="value">${result.pricing.base_price}</div>
+                        </div>
+                        <div class="pricing-item">
+                            <div class="label">Total LLPA</div>
+                            <div class="value">${result.pricing.llpa_total_bps} bps</div>
+                        </div>
+                        <div class="pricing-item" style="border-left-color: #28a745;">
+                            <div class="label">Net Price</div>
+                            <div class="value">${result.pricing.net_price}</div>
+                        </div>
+                    </div>
+            `;
+
+            if (result.pricing.components.length > 0) {
+                html += `<div class="llpa-components">
+                    <h4 style="margin-bottom: 10px;">LLPA Components</h4>`;
+                result.pricing.components.forEach(comp => {
+                    const isNegative = comp.value_bps.startsWith('-');
+                    html += `<div class="llpa-component">
+                        <div>
+                            <div class="name">${comp.name}</div>
+                            <div style="font-size: 0.85rem; color: #666;">${comp.reason}</div>
+                        </div>
+                        <div class="value ${isNegative ? 'negative' : ''}">${comp.value_bps} bps</div>
+                    </div>`;
+                });
+                html += `</div>`;
+            }
+
+            if (result.pricing.notes.length > 0) {
+                html += `<div style="margin-top: 15px;">
+                    <h4 style="margin-bottom: 10px;">Notes</h4>`;
+                result.pricing.notes.forEach(note => {
+                    html += `<div style="padding: 8px; background: white; border-radius: 6px; margin-bottom: 5px; font-size: 0.9rem;">• ${note}</div>`;
+                });
+                html += `</div>`;
+            }
+
+            html += `</div>`;
+
+            // All Rules Accordion
+            html += `
+                <div class="accordion">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <span>View All 16 Rules</span>
+                        <span>▼</span>
+                    </div>
+                    <div class="accordion-content">
+            `;
+
+            result.all_rules.forEach(rule => {
+                const statusClass = rule.eligible ? 'passed' : 'failed';
+                const statusText = rule.eligible ? '✓ Passed' : '✗ Failed';
+                html += `<div class="rule-item ${statusClass}">
+                    <div>
+                        <div style="font-weight: 600;">${rule.rule_name}</div>
+                        ${rule.messages.map(msg => `<div style="font-size: 0.85rem; color: #666;">• ${msg}</div>`).join('')}
+                    </div>
+                    <div class="rule-status ${statusClass}">${statusText}</div>
+                </div>`;
+            });
+
+            html += `</div></div>`;
+
+            console.log('Setting innerHTML with', html.length, 'characters');
+            resultsDiv.innerHTML = html;
+            console.log('innerHTML set successfully');
+        }
+
+        function toggleAccordion(header) {
+            const content = header.nextElementSibling;
+            content.classList.toggle('active');
+            const arrow = header.querySelector('span:last-child');
+            arrow.textContent = content.classList.contains('active') ? '▲' : '▼';
+        }
+
+        async function manualTest() {
+            console.log('🔬 Manual test started');
+
+            // Show loading
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('results').style.display = 'none';
+
+            // Hardcoded test data
+            const testData = {
+                credit_score: 760,
+                gross_monthly_income: 10000,
+                monthly_debts: 650,
+                num_financed_properties: 1,
+                first_time_homebuyer: false,
+                owns_property_last_3yrs: true,
+                liquid_assets: 50000,
+                ami_ratio: '',
+                purchase_price: 400000,
+                appraised_value: 400000,
+                units: 1,
+                property_type: 'SFR',
+                occupancy: 'primary',
+                condition_rating: 'C3',
+                is_high_cost_area: true,
+                loan_amount: 300000,
+                note_rate: 6.50,
+                term_months: 360,
+                purpose: 'purchase',
+                mi_type: '',
+                mi_coverage_pct: ''
+            };
+
+            console.log('Test data:', testData);
+
+            try {
+                console.log('Sending manual test request...');
+                const response = await fetch('/api/evaluate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                console.log('Manual test response status:', response.status);
+                console.log('Manual test response headers:', [...response.headers.entries()]);
+
+                const responseText = await response.text();
+                console.log('Manual test response length:', responseText.length);
+                console.log('Manual test response first 100 chars:', responseText.substring(0, 100));
+
+                const result = JSON.parse(responseText);
+                console.log('✓ Manual test JSON parsed successfully');
+                console.log('Manual test result:', result);
+
+                displayResults(result);
+
+            } catch (error) {
+                console.error('Manual test error:', error);
+                alert('Manual test failed: ' + error.message);
+            } finally {
+                document.getElementById('loading').classList.remove('active');
+            }
+        }
+    </script>
+</body>
+</html>

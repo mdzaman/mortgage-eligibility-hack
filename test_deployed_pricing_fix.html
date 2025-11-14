@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Deployed Pricing Fix</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 15px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .warning { background-color: #fff3cd; color: #856404; }
+        button { padding: 10px 20px; margin: 5px; }
+        .pricing-details { margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Test Deployed Pricing Fix</h1>
+    
+    <div>
+        <h2>API Endpoint</h2>
+        <p>Testing: <code>https://gm515kqhwd.execute-api.us-east-1.amazonaws.com/prod/api/evaluate</code></p>
+    </div>
+    
+    <div>
+        <button onclick="testPricingFields()">Test Pricing Fields</button>
+        <button onclick="testEligibilityLogic()">Test Eligibility Logic</button>
+    </div>
+    
+    <div id="results"></div>
+
+    <script>
+        const API_URL = 'https://gm515kqhwd.execute-api.us-east-1.amazonaws.com/prod/api/evaluate';
+        
+        async function testPricingFields() {
+            const testData = {
+                credit_score: 680,  // Lower credit for LLPA
+                gross_monthly_income: 8000,
+                monthly_debts: 1200,
+                num_financed_properties: 1,
+                first_time_homebuyer: false,
+                owns_property_last_3yrs: true,
+                liquid_assets: 30000,
+                ami_ratio: '',
+                purchase_price: 400000,
+                appraised_value: 400000,
+                units: 1,
+                property_type: 'SFR',
+                occupancy: 'primary',
+                condition_rating: 'C3',
+                is_high_cost_area: true,
+                loan_amount: 360000,  // 90% LTV for LLPA
+                note_rate: 6.50,
+                term_months: 360,
+                purpose: 'purchase',
+                mi_type: '',
+                mi_coverage_pct: ''
+            };
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    const pricing = result.pricing || {};
+                    
+                    let message = '<div class="test-result">';
+                    
+                    // Check if all required pricing fields are present and not undefined
+                    const requiredFields = ['base_rate', 'total_llpa', 'final_rate', 'rate_differential'];
+                    const missingFields = [];
+                    const undefinedFields = [];
+                    
+                    requiredFields.forEach(field => {
+                        if (!(field in pricing)) {
+                            missingFields.push(field);
+                        } else if (pricing[field] === undefined || pricing[field] === 'undefined') {
+                            undefinedFields.push(field);
+                        }
+                    });
+                    
+                    if (missingFields.length === 0 && undefinedFields.length === 0) {
+                        message += '<h3 class="success">✅ Pricing Fields Test PASSED</h3>';
+                        message += '<div class="pricing-details">';
+                        message += `<p><strong>Base Rate:</strong> ${pricing.base_rate}%</p>`;
+                        message += `<p><strong>Total LLPA:</strong> ${pricing.total_llpa}%</p>`;
+                        message += `<p><strong>Final Rate:</strong> ${pricing.final_rate}%</p>`;
+                        message += `<p><strong>Rate Differential:</strong> ${pricing.rate_differential}%</p>`;
+                        message += `<p><strong>LLPA Components:</strong> ${pricing.llpa_components?.length || 0}</p>`;
+                        
+                        if (pricing.llpa_components && pricing.llpa_components.length > 0) {
+                            message += '<p><strong>Components:</strong></p><ul>';
+                            pricing.llpa_components.forEach(comp => {
+                                message += `<li>${comp.name}: ${comp.value}% (${comp.reason})</li>`;
+                            });
+                            message += '</ul>';
+                        }
+                        message += '</div>';
+                    } else {
+                        message += '<h3 class="error">❌ Pricing Fields Test FAILED</h3>';
+                        if (missingFields.length > 0) {
+                            message += `<p>Missing fields: ${missingFields.join(', ')}</p>`;
+                        }
+                        if (undefinedFields.length > 0) {
+                            message += `<p>Undefined fields: ${undefinedFields.join(', ')}</p>`;
+                        }
+                    }
+                    
+                    message += '</div>';
+                    document.getElementById('results').innerHTML = message;
+                } else {
+                    throw new Error(result.error || 'API Error');
+                }
+            } catch (error) {
+                document.getElementById('results').innerHTML = 
+                    `<div class="test-result error"><h3>❌ Test FAILED</h3><p>Error: ${error.message}</p></div>`;
+            }
+        }
+        
+        async function testEligibilityLogic() {
+            // Test a scenario that should be denied due to high DTI
+            const testData = {
+                credit_score: 760,
+                gross_monthly_income: 5000,  // Low income
+                monthly_debts: 3000,         // High debts = high DTI
+                num_financed_properties: 1,
+                first_time_homebuyer: false,
+                owns_property_last_3yrs: true,
+                liquid_assets: 50000,
+                ami_ratio: '',
+                purchase_price: 400000,
+                appraised_value: 400000,
+                units: 1,
+                property_type: 'SFR',
+                occupancy: 'primary',
+                condition_rating: 'C3',
+                is_high_cost_area: true,
+                loan_amount: 300000,
+                note_rate: 6.50,
+                term_months: 360,
+                purpose: 'purchase',
+                mi_type: '',
+                mi_coverage_pct: ''
+            };
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    let message = '<div class="test-result">';
+                    
+                    if (result.eligibility_overall === false) {
+                        message += '<h3 class="success">✅ Eligibility Logic Test PASSED</h3>';
+                        message += '<p>High DTI scenario correctly denied</p>';
+                        message += `<p>DTI: ${result.calculated_metrics?.DTI || 'N/A'}</p>`;
+                        
+                        if (result.failed_rules && result.failed_rules.length > 0) {
+                            message += '<p><strong>Failed Rules:</strong></p><ul>';
+                            result.failed_rules.forEach(rule => {
+                                message += `<li>${rule.rule_name}: ${rule.messages.join(', ')}</li>`;
+                            });
+                            message += '</ul>';
+                        }
+                    } else {
+                        message += '<h3 class="warning">⚠️ Eligibility Logic Test WARNING</h3>';
+                        message += '<p>High DTI scenario was approved (may be expected based on rules)</p>';
+                        message += `<p>DTI: ${result.calculated_metrics?.DTI || 'N/A'}</p>`;
+                    }
+                    
+                    message += '</div>';
+                    document.getElementById('results').innerHTML += message;
+                } else {
+                    throw new Error(result.error || 'API Error');
+                }
+            } catch (error) {
+                document.getElementById('results').innerHTML += 
+                    `<div class="test-result error"><h3>❌ Eligibility Test FAILED</h3><p>Error: ${error.message}</p></div>`;
+            }
+        }
+    </script>
+</body>
+</html>

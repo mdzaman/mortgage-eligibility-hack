@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mortgage Engine API Test</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        h1 {
+            color: #4ec9b0;
+        }
+        .test {
+            background: #252526;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #007acc;
+        }
+        .success {
+            border-left-color: #4ec9b0;
+        }
+        .error {
+            border-left-color: #f48771;
+        }
+        pre {
+            background: #1e1e1e;
+            padding: 10px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #005a9e;
+        }
+        .log {
+            color: #ce9178;
+            padding: 2px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Mortgage Engine API Test</h1>
+
+    <button onclick="runTests()">Run All Tests</button>
+    <button onclick="clearLogs()">Clear Logs</button>
+
+    <div id="logs"></div>
+
+    <script>
+        function log(message, type = 'log') {
+            const logsDiv = document.getElementById('logs');
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log';
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            if (type === 'error') {
+                logEntry.style.color = '#f48771';
+            } else if (type === 'success') {
+                logEntry.style.color = '#4ec9b0';
+            }
+            logsDiv.appendChild(logEntry);
+        }
+
+        function clearLogs() {
+            document.getElementById('logs').innerHTML = '';
+        }
+
+        async function runTests() {
+            clearLogs();
+            log('Starting API tests...', 'log');
+
+            // Test 1: Check homepage
+            try {
+                log('Test 1: Checking homepage...', 'log');
+                const response = await fetch('/');
+                if (response.ok) {
+                    log('✓ Homepage loaded successfully', 'success');
+                } else {
+                    log(`✗ Homepage returned status ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`✗ Homepage test failed: ${error.message}`, 'error');
+            }
+
+            // Test 2: Check presets
+            try {
+                log('Test 2: Fetching presets...', 'log');
+                const response = await fetch('/api/presets');
+                const presets = await response.json();
+                log(`✓ Loaded ${Object.keys(presets).length} presets: ${Object.keys(presets).join(', ')}`, 'success');
+            } catch (error) {
+                log(`✗ Presets test failed: ${error.message}`, 'error');
+            }
+
+            // Test 3: Evaluate scenario
+            try {
+                log('Test 3: Evaluating mortgage scenario...', 'log');
+                const testData = {
+                    credit_score: 760,
+                    gross_monthly_income: 10000,
+                    monthly_debts: 650,
+                    num_financed_properties: 1,
+                    first_time_homebuyer: false,
+                    owns_property_last_3yrs: true,
+                    liquid_assets: 50000,
+                    ami_ratio: '',
+                    purchase_price: 400000,
+                    appraised_value: 400000,
+                    units: 1,
+                    property_type: 'SFR',
+                    occupancy: 'primary',
+                    condition_rating: 'C3',
+                    is_high_cost_area: true,
+                    loan_amount: 300000,
+                    note_rate: 6.50,
+                    term_months: 360,
+                    purpose: 'purchase',
+                    mi_type: '',
+                    mi_coverage_pct: ''
+                };
+
+                log('  - Sending POST request to /api/evaluate...', 'log');
+                const response = await fetch('/api/evaluate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                log(`  - Response status: ${response.status}`, 'log');
+
+                if (!response.ok) {
+                    const text = await response.text();
+                    log(`✗ API returned error: ${text}`, 'error');
+                    return;
+                }
+
+                const result = await response.json();
+
+                if (result.error) {
+                    log(`✗ API returned error: ${result.error}`, 'error');
+                    return;
+                }
+
+                log('✓ Scenario evaluated successfully!', 'success');
+                log(`  - Eligibility: ${result.eligibility_overall ? 'APPROVED ✓' : 'DENIED ✗'}`, 'success');
+                log(`  - LTV: ${result.calculated_metrics.LTV}`, 'success');
+                log(`  - DTI: ${result.calculated_metrics.DTI}`, 'success');
+                log(`  - Net Price: ${result.pricing.net_price}`, 'success');
+                log(`  - LLPA: ${result.pricing.llpa_total_bps} bps`, 'success');
+                log(`  - Rules evaluated: ${result.all_rules.length}`, 'success');
+                log(`  - Failed rules: ${result.failed_rules.length}`, 'success');
+
+                // Show detailed results
+                const testDiv = document.createElement('div');
+                testDiv.className = 'test success';
+                testDiv.innerHTML = `
+                    <h3>📊 Detailed Results</h3>
+                    <pre>${JSON.stringify(result, null, 2)}</pre>
+                `;
+                document.getElementById('logs').appendChild(testDiv);
+
+            } catch (error) {
+                log(`✗ Scenario evaluation failed: ${error.message}`, 'error');
+                console.error('Full error:', error);
+            }
+
+            log('Tests complete!', 'success');
+        }
+
+        // Auto-run tests on load
+        window.addEventListener('load', () => {
+            log('Page loaded. Click "Run All Tests" to start.', 'log');
+        });
+    </script>
+</body>
+</html>

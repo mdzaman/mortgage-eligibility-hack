@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CORS Test</title>
+</head>
+<body>
+    <h1>Testing CORS</h1>
+    <div id="result"></div>
+    <script>
+        async function testAPI() {
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                console.log('Testing /api/presets...');
+                const response = await fetch('/api/presets', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', [...response.headers.entries()]);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = '<h2>SUCCESS!</h2><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                } else {
+                    const text = await response.text();
+                    resultDiv.innerHTML = '<h2>ERROR ' + response.status + '</h2><pre>' + text + '</pre>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = '<h2>FETCH ERROR</h2><pre>' + error.message + '</pre>';
+            }
+        }
+        
+        // Test immediately
+        testAPI();
+    </script>
+</body>
+</html>

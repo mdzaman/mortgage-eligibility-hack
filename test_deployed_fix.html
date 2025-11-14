@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Deployed Fix</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        button { padding: 10px 20px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Test Deployed Validation Fix</h1>
+    
+    <div>
+        <h2>API Endpoint</h2>
+        <p>Testing: <code>https://gm515kqhwd.execute-api.us-east-1.amazonaws.com/prod/api/evaluate</code></p>
+    </div>
+    
+    <div>
+        <button onclick="testValidOccupancyAndPurpose()">Test Valid Values</button>
+        <button onclick="testInvalidValues()">Test Invalid Values</button>
+    </div>
+    
+    <div id="results"></div>
+
+    <script>
+        const API_URL = 'https://gm515kqhwd.execute-api.us-east-1.amazonaws.com/prod/api/evaluate';
+        
+        async function testValidOccupancyAndPurpose() {
+            const testData = {
+                credit_score: 760,
+                gross_monthly_income: 10000,
+                monthly_debts: 650,
+                num_financed_properties: 1,
+                first_time_homebuyer: false,
+                owns_property_last_3yrs: true,
+                liquid_assets: 50000,
+                ami_ratio: '',
+                purchase_price: 400000,
+                appraised_value: 400000,
+                units: 1,
+                property_type: 'SFR',
+                occupancy: 'primary',  // Fixed value
+                condition_rating: 'C3',
+                is_high_cost_area: true,
+                loan_amount: 300000,
+                note_rate: 6.50,
+                term_months: 360,
+                purpose: 'purchase',  // Fixed value
+                mi_type: '',
+                mi_coverage_pct: ''
+            };
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Check if occupancy and purpose rules passed
+                    const occupancyRule = result.all_rules?.find(r => r.rule_name === 'OCCUPANCY');
+                    const purposeRule = result.all_rules?.find(r => r.rule_name === 'LOAN_PURPOSE');
+                    
+                    let message = '<div class="test-result success">';
+                    message += '<h3>✅ Valid Values Test PASSED</h3>';
+                    message += `<p>Occupancy Rule: ${occupancyRule?.eligible ? 'PASSED' : 'FAILED'} - ${occupancyRule?.messages?.join(', ')}</p>`;
+                    message += `<p>Purpose Rule: ${purposeRule?.eligible ? 'PASSED' : 'FAILED'} - ${purposeRule?.messages?.join(', ')}</p>`;
+                    message += `<p>Overall Eligibility: ${result.eligibility_overall ? 'ELIGIBLE' : 'NOT ELIGIBLE'}</p>`;
+                    message += '</div>';
+                    
+                    document.getElementById('results').innerHTML = message;
+                } else {
+                    throw new Error(result.error || 'API Error');
+                }
+            } catch (error) {
+                document.getElementById('results').innerHTML = 
+                    `<div class="test-result error"><h3>❌ Test FAILED</h3><p>Error: ${error.message}</p></div>`;
+            }
+        }
+        
+        async function testInvalidValues() {
+            const testData = {
+                credit_score: 760,
+                gross_monthly_income: 10000,
+                monthly_debts: 650,
+                num_financed_properties: 1,
+                first_time_homebuyer: false,
+                owns_property_last_3yrs: true,
+                liquid_assets: 50000,
+                ami_ratio: '',
+                purchase_price: 400000,
+                appraised_value: 400000,
+                units: 1,
+                property_type: 'SFR',
+                occupancy: 'Primary',  // Invalid - wrong case
+                condition_rating: 'C3',
+                is_high_cost_area: true,
+                loan_amount: 300000,
+                note_rate: 6.50,
+                term_months: 360,
+                purpose: 'Purchase',  // Invalid - wrong case
+                mi_type: '',
+                mi_coverage_pct: ''
+            };
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    // Check if occupancy and purpose rules failed as expected
+                    const occupancyRule = result.all_rules?.find(r => r.rule_name === 'OCCUPANCY');
+                    const purposeRule = result.all_rules?.find(r => r.rule_name === 'LOAN_PURPOSE');
+                    
+                    let message = '<div class="test-result ' + (occupancyRule?.eligible === false && purposeRule?.eligible === false ? 'success' : 'error') + '">';
+                    message += '<h3>' + (occupancyRule?.eligible === false && purposeRule?.eligible === false ? '✅' : '❌') + ' Invalid Values Test</h3>';
+                    message += `<p>Occupancy Rule: ${occupancyRule?.eligible ? 'PASSED (unexpected)' : 'FAILED (expected)'} - ${occupancyRule?.messages?.join(', ')}</p>`;
+                    message += `<p>Purpose Rule: ${purposeRule?.eligible ? 'PASSED (unexpected)' : 'FAILED (expected)'} - ${purposeRule?.messages?.join(', ')}</p>`;
+                    message += '</div>';
+                    
+                    document.getElementById('results').innerHTML = message;
+                } else {
+                    document.getElementById('results').innerHTML = 
+                        `<div class="test-result success"><h3>✅ Invalid Values Properly Rejected</h3><p>API Error (expected): ${result.error}</p></div>`;
+                }
+            } catch (error) {
+                document.getElementById('results').innerHTML = 
+                    `<div class="test-result error"><h3>❌ Test FAILED</h3><p>Error: ${error.message}</p></div>`;
+            }
+        }
+    </script>
+</body>
+</html>
