@@ -55,6 +55,7 @@ class MortgageStack(Stack):
         )
 
         # API routes with explicit cache disabling
+        # Add GET method to root
         api.root.add_method("GET", lambda_integration,
             method_responses=[apigw.MethodResponse(
                 status_code="200",
@@ -65,21 +66,37 @@ class MortgageStack(Stack):
                 }
             )]
         )
-        
+
+        # Add HEAD method to root (fixes 403 errors)
+        api.root.add_method("HEAD", lambda_integration,
+            method_responses=[apigw.MethodResponse(
+                status_code="200",
+                response_parameters={
+                    "method.response.header.Cache-Control": True,
+                    "method.response.header.Pragma": True,
+                    "method.response.header.Expires": True
+                }
+            )]
+        )
+
         # /api routes (for frontend compatibility)
         api_resource = api.root.add_resource("api")
-        
+
         evaluate = api.root.add_resource("evaluate")
         evaluate.add_method("POST", lambda_integration)
-        
+        evaluate.add_method("HEAD", lambda_integration)
+
         api_evaluate = api_resource.add_resource("evaluate")
         api_evaluate.add_method("POST", lambda_integration)
-        
+        api_evaluate.add_method("HEAD", lambda_integration)
+
         presets = api.root.add_resource("presets")
         presets.add_method("GET", lambda_integration)
-        
+        presets.add_method("HEAD", lambda_integration)
+
         api_presets = api_resource.add_resource("presets")
         api_presets.add_method("GET", lambda_integration)
+        api_presets.add_method("HEAD", lambda_integration)
 
         # Output API URL
         CfnOutput(self, "ApiUrl", value=api.url)
