@@ -11,17 +11,17 @@ from mortgage_engine import (
 def handler(event, context):
     path = event.get('path', '/')
     method = event.get('httpMethod', 'GET')
-    
+
     # Normalize path
     if path.startswith('/prod'):
         path = path[5:]
     if path.startswith('/api'):
         path = path[4:]
-    
+
     # CORS headers for Lambda proxy integration with cache busting
     cors_headers = {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS,HEAD',
         'Access-Control-Allow-Headers': '*',
         'Access-Control-Max-Age': '86400',
         'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -29,6 +29,14 @@ def handler(event, context):
         'Expires': '0'
     }
     
+    # Handle HEAD requests for root path
+    if path == '/' and method == 'HEAD':
+        return {
+            'statusCode': 200,
+            'headers': {**cors_headers, 'Content-Type': 'text/html'},
+            'body': ''
+        }
+
     if path == '/' and method == 'GET':
         try:
             with open('templates/index.html', 'r') as f:
@@ -159,6 +167,14 @@ def handler(event, context):
                 'body': json.dumps({'error': str(e)})
             }
     
+    # Handle HEAD requests for /presets
+    elif path == '/presets' and method == 'HEAD':
+        return {
+            'statusCode': 200,
+            'headers': {**cors_headers, 'Content-Type': 'application/json'},
+            'body': ''
+        }
+
     elif path == '/presets' and method == 'GET':
         presets = {
             'prime_conforming': {
@@ -191,7 +207,15 @@ def handler(event, context):
             'headers': {**cors_headers, 'Content-Type': 'application/json'},
             'body': json.dumps(presets)
         }
-    
+
+    # Handle HEAD requests for /evaluate
+    elif path == '/evaluate' and method == 'HEAD':
+        return {
+            'statusCode': 200,
+            'headers': {**cors_headers, 'Content-Type': 'application/json'},
+            'body': ''
+        }
+
     return {
         'statusCode': 404,
         'headers': {**cors_headers, 'Content-Type': 'application/json'},
